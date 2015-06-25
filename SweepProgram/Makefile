@@ -1,0 +1,18 @@
+CC=g++
+CFLAGS=-I.
+
+DEPS = Util.h Sweep.h
+
+OBJ = main.o Sweep.o Util.o
+
+
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+main: $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS)
+
+.PHONY: clean
+
+clean:
+	rm -f *.o *~ core list.txt separation_checkpoint results.txt main

@@ -1,23 +1,40 @@
-/*************************************************************************************
-*                           Generates .lua Parameter Files                            *
-*                                                                                     *
-*                           Changeable Variables:                                     *
-*                           lines: 47, 48 (interval info)                             *
-*                           lines: 50-69 (Initial Parameters)                         *
-*                           lines: 72, 108 (Changing Parameter)                       *
-*                                                                                     *
-*                                                                                     *
-*                                                                                     *
-*                                                                                     *
-**************************************************************************************/
 #include "Sweep.h"
 
 using namespace std;
 
-void print_file(int wedge, background &BG, vector<stream> &STR, area &AREA)
+sweep::sweep(string paramFile)
+{
+//Read in basic parameters from file
+    ifstream infile;
+    infile.open(paramFile.c_str());
+    if(!infile.is_open())
+    {
+        throw string("Failed to open init file");
+    }
+    init(infile);
+
+
+//Eventually replace this by reading in from config file
+    paramMin1 = 1.22;
+    paramMax1 = 2.48;
+    numSteps1 = 5.;
+    paramMin2 = 2.42;
+    paramMax2 = 3.68;
+    numSteps2 = 5.;
+    initialized = true;
+}
+
+
+//Print parameter file for current step.
+int sweep::print_file()
 {
     ofstream output;
     output.open("sweepParams.lua");
+    if(!output.is_open())
+    {
+        cerr << "Unable to open file to print" << endl;
+        return -1;
+    }
     output << "\n wedge = " << wedge 
             << " \n \n background = { \n   ";
     BG.print(output);            
@@ -38,9 +55,11 @@ void print_file(int wedge, background &BG, vector<stream> &STR, area &AREA)
     AREA.print(output);     
     output << "\n   }\n}\n";
     output.close();
+    return 0;
 }
 
-void init(ifstream &infile, int &wedge, background &BG, vector <stream> &STR, area &AREA)
+//Designed to read in from lua file without actually using lua (maybe actually integrate lua interpreter later)
+void sweep::init(ifstream &infile)
 {
     string temp;
     locale x(locale::classic(), new comma_ctype);
@@ -82,176 +101,84 @@ void init(ifstream &infile, int &wedge, background &BG, vector <stream> &STR, ar
             >> temp >> temp >> AREA.nu_min
             >> temp >> temp >> AREA.nu_max
             >> temp >> temp >> AREA.nu_steps;
-} 
-
-double * getParamByName(string paramName, &BG, &STR)
-{
-    if(paramName == "q")
-    {
-        return &BG.q;
-    }
-    else if(paramName == "r0")
-    {
-        return &BG.r0;
-    }
-    else if(paramName == "epsilon1")
-    {
-        return &STR[0].epsilon;
-    }
-    else if(paramName == "mu1")
-    {
-        return &STR[0].mu;
-    }
-    else if(paramName == "r1")
-    {
-        return &STR[0].r;
-    }
-    else if(paramName == "theta1")
-    {
-        return &STR[0].theta;
-    }
-    else if(paramName == "phi1")
-    {
-        return &STR[0].phi;
-    }
-    else if(paramName == "sigma1")
-    {
-        return &STR[0].sigma;
-    }
-    else if(paramName == "epsilon2")
-    {
-        return &STR[1].epsilon;
-    }
-    else if(paramName == "mu2")
-    {
-        return &STR[1].mu;
-    }
-    else if(paramName == "r2")
-    {
-        return &STR[1].r;
-    }
-    else if(paramName == "theta2")
-    {
-        return &STR[1].theta;
-    }
-    else if(paramName == "phi2")
-    {
-        return &STR[1].phi;
-    }
-    else if(paramName == "sigma2")
-    {
-        return &STR[1].sigma;
-    }
-    else if(paramName == "epsilon3")
-    {
-        return &STR[2].epsilon;
-    }
-    else if(paramName == "mu3")
-    {
-        return &STR[2].mu;
-    }
-    else if(paramName == "r3")
-    {
-        return &STR[2].r;
-    }
-    else if(paramName == "theta3")
-    {
-        return &STR[2].theta;
-    }
-    else if(paramName == "phi3")
-    {
-        return &STR[2].phi;
-    }
-    else if(paramName == "sigma3")
-    {
-        return &STR[2].sigma;
-    }
-    else
-    {
-        return NULL;
-    }
 }
 
 
-int main (int argc, char* argv[]) 
+
+int sweep::run(string pathToSep, string resultFileName)
 {
-    if(argc < 2)
+    if(!initialized)
     {
-        cout << "Proper Usage <Input file> <Number of Steps> <Path to Separation>" << endl;
+        cerr << "Must initialized before running sweep" << endl;
         return -1;
     }
-    clock_t timer;
-    int numSteps = atoi(argv[2]);
-    ifstream infile;
-    infile.open(argv[1]);
     ofstream output;
     output.open("list.txt");
+    ifstream infile;
 
-    int wedge;
-    background BG;
-    vector <stream> STR;
-    area AREA;
-    time_t time1, time2;
-
-    init(infile, wedge, BG, STR, AREA);
-    infile.close();
-    
     string a = "-a./sweepParams.lua", s = "-s./stars-15-sim-1Jun1.txt";
-    
+
     double result = 0;
-    int counter = 0;
-    double * xparam = &STR[0].theta;
-    double * yparam = &STR[0].phi;
-    double paramMin1 = 1.22;
-    double paramMax1 = 2.48;
-    double numSteps1 = 50;
-    double paramMin2 = 2.42;
-    double paramMax2 = 3.68;
-    double numSteps2 = 50;
+    int status = 0;
     int i = 0;
-    time(&time1);
-    for(*xparam = paramMin1; *xparam < paramMax1; *xparam += (paramMax1-paramMin1)/numSteps1 )
+    //Step over parameters
+    for(STR[0].theta = paramMin1; STR[0].theta < paramMax1; STR[0].theta += (paramMax1-paramMin1)/numSteps1 )
     {
-        for(*yparam = paramMin2; *yparam < paramMax2; *yparam += (paramMax2-paramMin2)/numSteps2)
+        for(STR[0].phi = paramMin2; STR[0].phi < paramMax2; STR[0].phi += (paramMax2-paramMin2)/numSteps2)
         {
-            print_file(wedge, BG, STR, AREA);
+            if(print_file())
+            {
+                cerr << "Failed to print parameter file for sweep" << endl;
+                return -1;
+            }
+            //Fork to run MW@home to evaluate point
             pid_t id = fork();
             if (id == 0)
             {
-                execl((char *)argv[3], "milkyway_separation",  (char *)s.c_str(), (char *)a.c_str(), "-t", "-f", "-i", NULL);
+                execl((char *)pathToSep.c_str(), "milkyway_separation",  (char *)s.c_str(), (char *)a.c_str(), "-t", "-f", "-i", NULL);
                 exit(0);
             }
             else if (id < 0)
             {
                 cerr << "Failed to fork" << endl;
-                exit(1);
+                return -1;
             }
             int childExitStatus;
+            //BLOCK until done running
             waitpid( id, &childExitStatus, 0);
             if( !WIFEXITED(childExitStatus) )
             {
                 cerr << "waitpid() exited with an error: Status= " << WEXITSTATUS(childExitStatus) << endl;
-                return 0;
+                return -1;
             }
             else if( WIFSIGNALED(childExitStatus) )
             {
                 cerr << "waitpid() exited due to a signal: " << WTERMSIG(childExitStatus) << endl;
-                return 0;
+                return -1;
             }
-
+            //read in result from MW@home
             infile.open("results.txt");
+            if(!infile.is_open())
+            {
+                cerr << "Failed to open results" << endl;
+                return -1;
+            }
             infile >> result;
             infile.close();
-            output << setprecision(6) << *xparam << " " << setprecision(6) << *yparam << " " << setprecision(16) << result <<  endl;
+            //Print Likelihood and corresponding params to file
+            output << STR[0].theta << " " << STR[0].phi << " " << setprecision(16) << result <<  endl;
             if(i % (int)(numSteps1 * numSteps2/10) == 0)
             {
-                cout << counter << "0%" << endl;
-                counter++;
+                cout << status << "0%" << endl;
+                status++;
             }
             i++;
         }        
     }
-    time(&time2);
-    output << "Time to run: " << difftime(time2, time1) << endl;    
+
+
     return 0;
+
 }
+
+ 
