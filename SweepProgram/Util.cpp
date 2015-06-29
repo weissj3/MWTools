@@ -1,8 +1,8 @@
 #include "Util.h"
 
-double * getParamByName(std::string paramName, background &BG, std::vector <stream> &STR)
+double * getParamByName(std::string paramName, background &BG, stream * STR)
 {
-    if(STR.size() != 3)
+    if(!STR)
     {
         std::cerr << "Tried to get param without initializing streams" << std::endl;
         return NULL;

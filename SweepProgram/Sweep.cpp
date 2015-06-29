@@ -11,6 +11,7 @@ sweep::sweep(string paramFile)
     {
         throw string("Failed to open init file");
     }
+    STR = NULL;
     init(infile);
 
 
@@ -21,9 +22,27 @@ sweep::sweep(string paramFile)
     paramMin2 = 2.42;
     paramMax2 = 3.68;
     numSteps2 = 5.;
+    xparam = &(STR[0].theta);
+    yparam = &(STR[0].phi);
     initialized = true;
 }
 
+sweep::~sweep()
+{
+   cleanup();
+}
+
+void sweep::cleanup()
+{
+    if(initialized)
+    {    
+        initialized = false;  
+        if(STR)
+        {   
+            delete[] STR;
+        }
+    }
+}
 
 //Print parameter file for current step.
 int sweep::print_file()
@@ -39,10 +58,10 @@ int sweep::print_file()
             << " \n \n background = { \n   ";
     BG.print(output);            
     output << "\n } \n \n streams = { \n";
-    for(int i = 0; i < STR.size(); i++)
+    for(int i = 0; i < numStreams; i++)
     {
         STR[i].print(output);
-        if(i != STR.size()-1)
+        if(i != numStreams-1)
         {
             output << ",\n\n";
         }
@@ -61,6 +80,7 @@ int sweep::print_file()
 //Designed to read in from lua file without actually using lua (maybe actually integrate lua interpreter later)
 void sweep::init(ifstream &infile)
 {
+    vector<stream> STRTMP;
     string temp;
     locale x(locale::classic(), new comma_ctype);
     infile.imbue(x);
@@ -76,18 +96,18 @@ void sweep::init(ifstream &infile)
             infile >> temp;
             if(temp  == "{")
             {
-                STR.push_back(stream());
+                STRTMP.push_back(stream());
             }
             else
             {
                 break;
             }
-            infile >> temp >> temp >> STR[STR.size()-1].epsilon 
-                    >> temp >> temp >> STR[STR.size()-1].mu 
-                    >> temp >> temp >> STR[STR.size()-1].r
-                    >> temp >> temp >> STR[STR.size()-1].theta
-                    >> temp >> temp >> STR[STR.size()-1].phi
-                    >> temp >> temp >> STR[STR.size()-1].sigma
+            infile >> temp >> temp >> STRTMP[STRTMP.size()-1].epsilon 
+                    >> temp >> temp >> STRTMP[STRTMP.size()-1].mu 
+                    >> temp >> temp >> STRTMP[STRTMP.size()-1].r
+                    >> temp >> temp >> STRTMP[STRTMP.size()-1].theta
+                    >> temp >> temp >> STRTMP[STRTMP.size()-1].phi
+                    >> temp >> temp >> STRTMP[STRTMP.size()-1].sigma
                     >> temp;
     }
     infile >> temp >> temp >> temp
@@ -101,6 +121,17 @@ void sweep::init(ifstream &infile)
             >> temp >> temp >> AREA.nu_min
             >> temp >> temp >> AREA.nu_max
             >> temp >> temp >> AREA.nu_steps;
+
+    STR = new stream[STRTMP.size()];
+    if(!STR)
+    {
+        cerr << "New failed" << endl;
+    }
+    numStreams = STRTMP.size();
+    for(int i = 0; i < STRTMP.size(); i++)
+    {
+        STR[i] = STRTMP[i];
+    }
 }
 
 
@@ -122,9 +153,9 @@ int sweep::run(string pathToSep, string resultFileName)
     int status = 0;
     int i = 0;
     //Step over parameters
-    for(STR[0].theta = paramMin1; STR[0].theta < paramMax1; STR[0].theta += (paramMax1-paramMin1)/numSteps1 )
+    for(*xparam = paramMin1; *xparam < paramMax1; *xparam += (paramMax1-paramMin1)/numSteps1 )
     {
-        for(STR[0].phi = paramMin2; STR[0].phi < paramMax2; STR[0].phi += (paramMax2-paramMin2)/numSteps2)
+        for(*yparam = paramMin2; *yparam < paramMax2; *yparam += (paramMax2-paramMin2)/numSteps2)
         {
             if(print_file())
             {
@@ -175,7 +206,6 @@ int sweep::run(string pathToSep, string resultFileName)
             i++;
         }        
     }
-
 
     return 0;
 

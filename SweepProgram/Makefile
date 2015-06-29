@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-I.
+CFLAGS=-I. -Wall
 
 DEPS = Util.h Sweep.h
 

@@ -8,7 +8,8 @@ private:
     int wedge;
     area AREA;
     background BG;
-    std::vector<stream> STR;
+    stream * STR;
+    int numStreams;
 
     double paramMin1;
     double paramMax1;
@@ -16,16 +17,21 @@ private:
     double paramMin2;
     double paramMax2;
     double numSteps2;
-
+    
+    double * xparam;
+    double * yparam;    
+    
     bool initialized; 
 
     int print_file();
     void init(std::ifstream &infile);
 
 public:
+    ~sweep();
     sweep() { initialized = false; }
     sweep(std::string paramFile);
     int run(std::string pathToSep, std::string resultFileName);
+    void cleanup();
 
 };
 

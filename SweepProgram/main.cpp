@@ -1,10 +1,10 @@
 /*************************************************************************************
 *                           Generates .lua Parameter Files                            *
 *                                                                                     *
-*                           Changeable Variables:                                     *
-*                           lines: 47, 48 (interval info)                             *
-*                           lines: 50-69 (Initial Parameters)                         *
-*                           lines: 72, 108 (Changing Parameter)                       *
+*                                                                                     *
+*                                                                                     *
+*                                                                                     *
+*                                                                                     *
 *                                                                                     *
 *                                                                                     *
 *                                                                                     *
@@ -23,27 +23,31 @@ int main (int argc, char* argv[])
         cout << "Proper Usage <Input file> <Path to Separation>" << endl;
         return -1;
     }
-    clock_t timer;
-    sweep Sweep1;
+
     try
     {
-        Sweep1 = sweep(argv[1]);
+        clock_t timer;
+        sweep * Sweep1;
+        Sweep1 = new sweep(argv[1]);
+    
+        pid_t parentPid = getpid();
+        cout << "Parent PID: " << parentPid << endl;
+        time_t time1, time2;
+        time(&time1);
+        if(Sweep1->run(argv[2], "list.txt"))
+        {
+            return -1;
+        }
+
+        time(&time2);
+        cout << "Time to run: " << difftime(time2, time1) << endl;   
+        Sweep1->cleanup(); 
+        delete Sweep1;
     }
     catch(string error)
     {
         cerr << error << endl;
         return -1;
     }    
-    
-    time_t time1, time2;
-    time(&time1);
-
-    if(Sweep1.run(argv[2], "list.txt"))
-    {
-        return -1;
-    }
-
-    time(&time2);
-    cout << "Time to run: " << difftime(time2, time1) << endl;    
     return 0;
 }
