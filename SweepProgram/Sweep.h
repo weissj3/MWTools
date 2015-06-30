@@ -1,10 +1,12 @@
 #ifndef _SWEEP_H_
 #define _SWEEP_H_
-#include "Util.h"
+#include "Scheduler.h"
 
 class sweep
 {
 private:
+    scheduler * Scheduler;
+
     int wedge;
     area AREA;
     background BG;
@@ -29,7 +31,7 @@ private:
 public:
     ~sweep();
     sweep() { initialized = false; }
-    sweep(std::string paramFile);
+    sweep(std::string paramFile, scheduler * sched);
     int run(std::string pathToSep, std::string resultFileName);
     void cleanup();
 

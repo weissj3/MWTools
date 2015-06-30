@@ -24,7 +24,7 @@ private:
     
 public:
     runInstance();
-    runInstance(background bg, const stream * str, int numStreams, area ar, double x, double y);
+    runInstance(int w, background bg, const stream * str, int numStreams, area ar, double x, double y);
     
     pid_t getRunPid() { return runPid; }
     unsigned int getId() { return runId; }

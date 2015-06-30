@@ -2,8 +2,13 @@
 
 using namespace std;
 
-sweep::sweep(string paramFile)
+sweep::sweep(string paramFile, scheduler * sched)
 {
+    if(!sched)
+    {
+        throw string("Sweeps require a scheduler");
+    }
+    Scheduler = sched;
 //Read in basic parameters from file
     ifstream infile;
     infile.open(paramFile.c_str());
@@ -153,57 +158,11 @@ int sweep::run(string pathToSep, string resultFileName)
     int status = 0;
     int i = 0;
     //Step over parameters
-    for(*xparam = paramMin1; *xparam < paramMax1; *xparam += (paramMax1-paramMin1)/numSteps1 )
+    for(*xparam = paramMin1; *xparam < paramMax1; *xparam += (paramMax1-paramMin1)/(numSteps1 - 1) )
     {
-        for(*yparam = paramMin2; *yparam < paramMax2; *yparam += (paramMax2-paramMin2)/numSteps2)
+        for(*yparam = paramMin2; *yparam < paramMax2; *yparam += (paramMax2-paramMin2)/(numSteps2 - 1))
         {
-            if(print_file())
-            {
-                cerr << "Failed to print parameter file for sweep" << endl;
-                return -1;
-            }
-            //Fork to run MW@home to evaluate point
-            pid_t id = fork();
-            if (id == 0)
-            {
-                execl((char *)pathToSep.c_str(), "milkyway_separation",  (char *)s.c_str(), (char *)a.c_str(), "-t", "-f", "-i", NULL);
-                exit(0);
-            }
-            else if (id < 0)
-            {
-                cerr << "Failed to fork" << endl;
-                return -1;
-            }
-            int childExitStatus;
-            //BLOCK until done running
-            waitpid( id, &childExitStatus, 0);
-            if( !WIFEXITED(childExitStatus) )
-            {
-                cerr << "waitpid() exited with an error: Status= " << WEXITSTATUS(childExitStatus) << endl;
-                return -1;
-            }
-            else if( WIFSIGNALED(childExitStatus) )
-            {
-                cerr << "waitpid() exited due to a signal: " << WTERMSIG(childExitStatus) << endl;
-                return -1;
-            }
-            //read in result from MW@home
-            infile.open("results.txt");
-            if(!infile.is_open())
-            {
-                cerr << "Failed to open results" << endl;
-                return -1;
-            }
-            infile >> result;
-            infile.close();
-            //Print Likelihood and corresponding params to file
-            output << STR[0].theta << " " << STR[0].phi << " " << setprecision(16) << result <<  endl;
-            if(i % (int)(numSteps1 * numSteps2/10) == 0)
-            {
-                cout << status << "0%" << endl;
-                status++;
-            }
-            i++;
+            Scheduler->requestRun(wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
         }        
     }
 

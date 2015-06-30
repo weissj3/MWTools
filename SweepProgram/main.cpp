@@ -27,8 +27,9 @@ int main (int argc, char* argv[])
     try
     {
         clock_t timer;
-        sweep * Sweep1;
-        Sweep1 = new sweep(argv[1]);
+        scheduler * Scheduler = new scheduler(true, 7);
+
+        sweep * Sweep1 = new sweep(argv[1], Scheduler);
     
         pid_t parentPid = getpid();
         cout << "Parent PID: " << parentPid << endl;

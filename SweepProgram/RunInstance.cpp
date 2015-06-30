@@ -10,8 +10,9 @@ runInstance::runInstance()
     yparam = 0;
 }
 
-runInstance::runInstance(background bg, const stream * str, int numStreams, area ar, double x, double y)
+runInstance::runInstance(int w, background bg, const stream * str, int numStreams, area ar, double x, double y)
 {
+    wedge = w;
     likelihood = 1;
     runId = 0;
     BG = bg;

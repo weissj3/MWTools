@@ -19,8 +19,9 @@ private:
 public:
     scheduler();
     scheduler(bool useGPU, int numCores);
+    ~scheduler();
     
-    int requestRun(runInstance params);
+    int requestRun(int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam);
     int update();
     void cleanup();
 
