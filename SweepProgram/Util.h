@@ -25,6 +25,12 @@
 #include <locale>
 #include <cstring>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <list>
+#include <queue>
+#include <sstream>
+
 
 class comma_ctype : public std::ctype<char>
 {

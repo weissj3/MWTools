@@ -9,10 +9,10 @@ private:
 
     bool GPUfree;
     int CoresFree;
-    std::vector <pid_t> CPUpids;
+    std::vector <runInstance*> CPUpids;
     pid_t GPUpid;
-    std::queue <runInstance> runQueue;
-    std::list <runInstance> printQueue;
+    std::queue <runInstance*> runQueue;
+    std::list <runInstance*> printQueue;
 
 
 

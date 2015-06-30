@@ -6,7 +6,7 @@
 class runInstance
 {
 private:
-    
+    int wedge;
     background BG;
     std::vector <stream> STR;
     area AREA;
@@ -16,19 +16,24 @@ private:
 
     unsigned int runId;
     double likelihood;
+    pid_t runPid;
 
-    int printParams(string filename);
+
+    int printParams();
+    pid_t run(std::string pathToSep, unsigned int Id, std::string commandLine);
     
 public:
     runInstance();
-    runInstance(background bg, const stream * str, area ar, double x, double y);
+    runInstance(background bg, const stream * str, int numStreams, area ar, double x, double y);
     
+    pid_t getRunPid() { return runPid; }
+    unsigned int getId() { return runId; }
     bool isRunning();
     bool isFinished();
-    pid_t runCPU(unsigned int Id);
-    pid_t runGPU(unsigned int Id);
+    pid_t runCPU(std::string pathToSep, unsigned int Id);
+    pid_t runGPU(std::string pathToSep, unsigned int Id);
     
-    printLikelihood(string filename);
+    int printLikelihood(std::string filename);
     
 
 
