@@ -197,7 +197,7 @@ int sweep::run(string pathToSep, string resultFileName)
             infile >> result;
             infile.close();
             //Print Likelihood and corresponding params to file
-            output << STR[0].theta << " " << STR[0].phi << " " << setprecision(16) << result <<  endl;
+            output << *xparam << " " << *yparam << " " << setprecision(16) << result <<  endl;
             if(i % (int)(numSteps1 * numSteps2/10) == 0)
             {
                 cout << status << "0%" << endl;
