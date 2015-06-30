@@ -29,9 +29,7 @@ int main (int argc, char* argv[])
         clock_t timer;
         sweep * Sweep1;
         Sweep1 = new sweep(argv[1]);
-    
-        pid_t parentPid = getpid();
-        cout << "Parent PID: " << parentPid << endl;
+
         time_t time1, time2;
         time(&time1);
         if(Sweep1->run(argv[2], "list.txt"))
