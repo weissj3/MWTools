@@ -31,10 +31,13 @@ public:
     unsigned int getId() { return runId; }
     bool isRunning();
     bool isFinished();
+
+    int updateStatus();
+
     pid_t runCPU(std::string pathToSep, unsigned int Id);
     pid_t runGPU(std::string pathToSep, unsigned int Id);
     
-    void kill();
+    void killRun();
     
     int printLikelihood(std::string filename);
     

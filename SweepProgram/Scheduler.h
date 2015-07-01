@@ -7,18 +7,22 @@ class scheduler
 {
 private:
 
-    bool GPUfree;
+    bool useGPU;
     int CoresFree;
-    std::vector <runInstance*> CPUpids;
-    pid_t GPUpid;
+    std::vector <runInstance*> CPUInstances;
+    runInstance * GPUInstance;
     std::queue <runInstance*> runQueue;
-    std::list <runInstance*> printQueue;
+    std::queue <runInstance*> printQueue;
+    std::string pathToSep;
 
-
+    int updateRunning();
+    int cleanUpFinished();
+    int startNewRuns();
+    int printFinishedRuns();
 
 public:
     scheduler();
-    scheduler(bool useGPU, int numCores);
+    scheduler(bool useGPU, int numCores, std::string separationPath);
     ~scheduler();
     
     int requestRun(int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam);

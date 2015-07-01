@@ -4,21 +4,23 @@ using namespace std;
 
 scheduler::scheduler()
 {
-    GPUfree = false;
+    useGPU = false;
     CoresFree = 0;
+    GPUInstance = NULL;
 }
 
-scheduler::scheduler(bool useGPU, int numCores)
+scheduler::scheduler(bool GPUapp, int numCores, string separationPath)
 {
-    GPUfree = useGPU;
+    useGPU = GPUapp;
     if(useGPU)
     {
         numCores -= 1;
     }
     CoresFree = numCores;
 
-    CPUpids.resize(numCores, 0);
-    GPUpid = 0;
+    CPUInstances.resize(numCores, NULL);
+    GPUInstance = NULL;
+    pathToSep = separationPath;
 }
 
 scheduler::~scheduler()
@@ -37,16 +39,150 @@ int scheduler::requestRun(int wedge, background BG, const stream * STR, int numS
     return -1;
 }
 
+int scheduler::updateRunning()
+{
+    //Update all Current Runs
+    if(GPUInstance)
+    {
+        if(GPUInstance->updateStatus() < 0)
+        {
+            return -1;
+        }
+    }
+    for(int i = 0; i < CPUInstances.size(); i++)
+    {
+        if(CPUInstances[i])
+        {
+            if((CPUInstances[i])->updateStatus() < 0)
+            {
+                return -1;
+            }
+        }
+    }
+    return 0;
+}
+
+int scheduler::cleanUpFinished()
+{
+    //Handle runs that finished during update
+    if(GPUInstance)
+    {
+        if(GPUInstance->isFinished())
+        {
+            GPUInstance = NULL;
+        }
+    }
+    for(int i = 0; i < CPUInstances.size(); i++)
+    {
+        if(CPUInstances[i])
+        {
+            if((CPUInstances[i])->isFinished())
+            {
+                CPUInstances[i] = NULL;
+            }
+        }
+    }
+    return 0;
+}
+
+int scheduler::startNewRuns()
+{
+    //Handle runs that finished during update
+    if(!GPUInstance and useGPU and !runQueue.empty())
+    {
+        GPUInstance = runQueue.front();
+        if(GPUInstance->runGPU(pathToSep, CPUInstances.size() + 1))
+        {
+            runQueue.pop();
+        }
+    }
+    for(int i = 0; i < CPUInstances.size(); i++)
+    {
+        if(!CPUInstances[i] and !runQueue.empty())
+        {
+            CPUInstances[i] = runQueue.front();
+            if(CPUInstances[i]->runCPU(pathToSep, i))
+            {
+                runQueue.pop();
+            }
+        }
+    }
+    return 0;
+}
+
+int scheduler::printFinishedRuns()
+{
+    //Handle runs that finished during update
+    while(!printQueue.empty() and (printQueue.front())->isFinished())
+    {
+        printQueue.front()->printLikelihood("list.txt"); //Eventually take name from config file.
+        delete printQueue.front();
+        printQueue.pop();
+    }
+    return 0;
+}
+
 int scheduler::update()
 {
-    
-    
-    return -1;
-    
+    int result = 0;
+    result = updateRunning();
+    if(result < 0)
+    {
+        return result;
+    }
+    result = cleanUpFinished();
+    if(result < 0)
+    {
+        return result;
+    }
+    result = startNewRuns();
+    if(result < 0)
+    {
+        return result;
+    }
+    result = printFinishedRuns();
+    if(result < 0)
+    {
+        return result;
+    }
+    if(printQueue.empty() and runQueue.empty() and !GPUInstance)
+    {
+        for(int i = 0; i < CPUInstances.size(); i++)
+        {
+            if(CPUInstances[i])
+            {
+                return 0;
+            }
+        }
+        //Jobs done return 1;
+        return 1;
+    }
+
+    return 0;
+  
 }
 
 void scheduler::cleanup()
 {
+    //Kill Child Processes
+    if(GPUInstance)
+    {
+        GPUInstance->killRun();
+    }
+    for(int i = 0; i < CPUInstances.size(); i++)
+    {
+        (CPUInstances[i])->killRun();
+    }
 
-
+    //Clean up leftover dynamic memory
+    while(!printQueue.empty())
+    {
+        delete printQueue.front();
+        printQueue.pop();
+    }
+    while(!runQueue.empty())
+    {
+        delete runQueue.front();
+        runQueue.pop();
+    }
 }

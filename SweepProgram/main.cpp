@@ -27,7 +27,7 @@ int main (int argc, char* argv[])
     try
     {
         clock_t timer;
-        scheduler * Scheduler = new scheduler(true, 7);
+        scheduler * Scheduler = new scheduler(true, 7, argv[2]);
 
         sweep * Sweep1 = new sweep(argv[1], Scheduler);
     
@@ -35,7 +35,7 @@ int main (int argc, char* argv[])
         cout << "Parent PID: " << parentPid << endl;
         time_t time1, time2;
         time(&time1);
-        if(Sweep1->run(argv[2], "list.txt"))
+        if(Sweep1->run())
         {
             return -1;
         }

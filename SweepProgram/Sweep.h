@@ -32,7 +32,7 @@ public:
     ~sweep();
     sweep() { initialized = false; }
     sweep(std::string paramFile, scheduler * sched);
-    int run(std::string pathToSep, std::string resultFileName);
+    int run();
     void cleanup();
 
 };

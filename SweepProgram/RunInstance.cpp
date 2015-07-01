@@ -29,13 +29,12 @@ runInstance::runInstance(int w, background bg, const stream * str, int numStream
     
 runInstance::~runInstance()
 {
-    kill();
+    killRun();
 }
 
-void runInstance::kill()
+void runInstance::killRun()
 {
-
-
+    kill(runPid, SIGKILL);
 }
 
 bool runInstance::isRunning()
@@ -153,7 +152,46 @@ pid_t runInstance::run(string pathToSep, unsigned int Id, std::string commandLin
     return runPid;
 }
 
+int runInstance::updateStatus()
+{
+    if(!isRunning())
+    {
+        return 0;
+    }
+    int childExitStatus;
+    if(waitpid( runPid, &childExitStatus, WNOHANG))
+    {
+        if( !WIFEXITED(childExitStatus) )
+        {
+            cerr << "waitpid() exited with an error: Status= " << WEXITSTATUS(childExitStatus) << endl;
+            return -1;
+        }
+        else if( WIFSIGNALED(childExitStatus) )
+        {
+            cerr << "waitpid() exited due to a signal: " << WTERMSIG(childExitStatus) << endl;
+            return -1;
+        }
+        else
+        {
+            stringstream tempstringstream;
+            tempstringstream << runId;
+            string resultFilePath = tempstringstream.str() + "/results.txt";
+            ifstream infile;
+            infile.open(resultFilePath.c_str());
+            if(!infile.is_open())
+            {
+                cerr << "Failed to open results: " << resultFilePath << endl;
+                return -1;
+            }
+            infile >> likelihood;
+            infile.close();
+            //Print Likelihood and corresponding params to file
+            return 0;
+        }
 
+    }
+    return 0;
+}
 
 
 

@@ -141,7 +141,7 @@ void sweep::init(ifstream &infile)
 
 
 
-int sweep::run(string pathToSep, string resultFileName)
+int sweep::run()
 {
     if(!initialized)
     {
@@ -150,6 +150,7 @@ int sweep::run(string pathToSep, string resultFileName)
     }
     ofstream output;
     output.open("list.txt");
+    output.close();
     ifstream infile;
 
     string a = "-a./sweepParams.lua", s = "-s./stars-15-sim-1Jun1.txt";
@@ -166,7 +167,20 @@ int sweep::run(string pathToSep, string resultFileName)
         }        
     }
 
-    return 0;
+    int schedulerStatus = 0;
+    while(!schedulerStatus)
+    {
+        schedulerStatus = Scheduler->update();
+    }
+
+    if(schedulerStatus < 0)
+    {
+        cerr << "Exited with error " << schedulerStatus << endl;
+    }
+
+    Scheduler->cleanup();
+
+    return schedulerStatus;
 
 }
 
