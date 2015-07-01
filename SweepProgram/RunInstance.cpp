@@ -27,6 +27,17 @@ runInstance::runInstance(int w, background bg, const stream * str, int numStream
     yparam = y;
 }
     
+runInstance::~runInstance()
+{
+    kill();
+}
+
+void runInstance::kill()
+{
+
+
+}
+
 bool runInstance::isRunning()
 {
     return runId;

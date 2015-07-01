@@ -25,13 +25,16 @@ private:
 public:
     runInstance();
     runInstance(int w, background bg, const stream * str, int numStreams, area ar, double x, double y);
-    
+    ~runInstance();    
+
     pid_t getRunPid() { return runPid; }
     unsigned int getId() { return runId; }
     bool isRunning();
     bool isFinished();
     pid_t runCPU(std::string pathToSep, unsigned int Id);
     pid_t runGPU(std::string pathToSep, unsigned int Id);
+    
+    void kill();
     
     int printLikelihood(std::string filename);
     
