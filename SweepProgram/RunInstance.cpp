@@ -124,6 +124,7 @@ pid_t runInstance::run(string pathToSep, unsigned int Id, std::string commandLin
         stringstream tempstringstream;
         tempstringstream << Id;
         string directory = tempstringstream.str();
+        cout << "Creating directory: " << Id << endl;
         //Lots of system call so lots of error checking
         if(mkdir((char *) directory.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) and errno != EEXIST)
         {

@@ -22,7 +22,7 @@ private:
 
 public:
     scheduler();
-    scheduler(bool useGPU, int numCores, std::string separationPath);
+    scheduler(bool GPUapp, int numCores, std::string separationPath);
     ~scheduler();
     
     int requestRun(int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam);

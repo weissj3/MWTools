@@ -27,7 +27,7 @@ int main (int argc, char* argv[])
     try
     {
         clock_t timer;
-        scheduler * Scheduler = new scheduler(true, 7, argv[2]);
+        scheduler * Scheduler = new scheduler(false, 7, argv[2]);
 
         sweep * Sweep1 = new sweep(argv[1], Scheduler);
     
