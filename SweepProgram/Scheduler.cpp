@@ -93,6 +93,7 @@ int scheduler::startNewRuns()
         GPUInstance = runQueue.front();
         if(GPUInstance->runGPU(pathToSep, CPUInstances.size() + 1))
         {
+            printQueue.push(GPUInstance);
             runQueue.pop();
         }
     }
@@ -103,6 +104,7 @@ int scheduler::startNewRuns()
             CPUInstances[i] = runQueue.front();
             if(CPUInstances[i]->runCPU(pathToSep, i))
             {
+		printQueue.push(CPUInstances[i]);
                 runQueue.pop();
             }
         }
@@ -115,7 +117,11 @@ int scheduler::printFinishedRuns()
     //Handle runs that finished during update
     while(!printQueue.empty() and (printQueue.front())->isFinished())
     {
-        printQueue.front()->printLikelihood("list.txt"); //Eventually take name from config file.
+        cout << "Printing" << endl;
+        if(!printQueue.front()->printLikelihood("list.txt"))  //Eventually take name from config file.
+        {
+            return -1;
+        }
         delete printQueue.front();
         printQueue.pop();
     }

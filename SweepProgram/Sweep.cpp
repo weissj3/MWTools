@@ -153,7 +153,7 @@ int sweep::run()
     output.close();
     ifstream infile;
 
-    string a = "-a./sweepParams.lua", s = "-s./stars-15-sim-1Jun1.txt";
+    string a = "-a./sweepParams.lua", s = "-s../stars-15-sim-1Jun1.txt";
 
     double result = 0;
     int status = 0;

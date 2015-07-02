@@ -95,6 +95,7 @@ int runInstance::printLikelihood(string filename)
         return -1;
     }
     output << xparam << " " << yparam << " " << setprecision(16) << likelihood <<  endl;
+    output.close();
     return 0;
 }
 
@@ -106,7 +107,7 @@ pid_t runInstance::runCPU(string pathToSep, unsigned int Id)
 
 pid_t runInstance::runGPU(string pathToSep, unsigned int Id)
 {
-    string command = "";
+    string command = "-c";
     return run(pathToSep, Id, command);
 }
 
@@ -115,22 +116,32 @@ pid_t runInstance::run(string pathToSep, unsigned int Id, std::string commandLin
 {
     runId = Id;
 
+    stringstream tempstringstream;
+    tempstringstream << Id;
+    string directory = tempstringstream.str();
+    cout << "Creating directory: " << Id << endl;
+    //Lots of system call so lots of error checking
+    if(mkdir((char *) directory.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) and errno != EEXIST)
+    {
+        cerr << "Failed to create directory " << directory << endl;
+        exit(-1);
+    }
+    
+    //Copy MW@home Executable to Fix Lock_file issues  ADD Error checking to make sure is_open and chmod work
+    ifstream source(pathToSep.c_str(), ios::binary);
+    ofstream dest((directory + "/milkyway_separation").c_str(), ios::binary);
+
+    dest << source.rdbuf();
+
+    source.close();
+    dest.close();
+
+    chmod((directory + "/milkyway_separation").c_str(), S_IRUSR | S_IWUSR | S_IXUSR | S_IXGRP | S_IWGRP | S_IRGRP | S_IROTH );
     //Fork to run MW@home to evaluate point
-    runId = fork();
+    runPid = fork();
     if (runPid == 0)
     {
-        pathToSep = "../" + pathToSep;
         string a = "-a./sweepParams.lua", s = "-s../stars-15-sim-1Jun1.txt";  //Eventually will be part of config file
-        stringstream tempstringstream;
-        tempstringstream << Id;
-        string directory = tempstringstream.str();
-        cout << "Creating directory: " << Id << endl;
-        //Lots of system call so lots of error checking
-        if(mkdir((char *) directory.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) and errno != EEXIST)
-        {
-            cerr << "Failed to create directory " << directory << endl;
-            exit(-1);
-        }
         if(chdir((char *) directory.c_str()))
         {
             cerr << "Failed to change to directory " << directory << endl;
@@ -141,7 +152,7 @@ pid_t runInstance::run(string pathToSep, unsigned int Id, std::string commandLin
             cerr << "Failed to print parameter file for sweep" << endl;
             exit(-1);
         }
-        execl((char *)pathToSep.c_str(), "milkyway_separation",  (char *)s.c_str(), (char *)a.c_str(), "-t", "-f", "-i", (char *) commandLine.c_str(), NULL);
+        execl("./milkyway_separation", "milkyway_separation",  (char *)s.c_str(), (char *)a.c_str(), "-t", "-f", "-i", (char *) commandLine.c_str(), NULL);
         exit(0);
     }
     else if (runPid < 0)
@@ -174,6 +185,7 @@ int runInstance::updateStatus()
         }
         else
         {
+            //Get Likelihood
             stringstream tempstringstream;
             tempstringstream << runId;
             string resultFilePath = tempstringstream.str() + "/results.txt";
@@ -186,7 +198,8 @@ int runInstance::updateStatus()
             }
             infile >> likelihood;
             infile.close();
-            //Print Likelihood and corresponding params to file
+            cout << likelihood << endl;
+            runPid = 0;
             return 0;
         }
 
