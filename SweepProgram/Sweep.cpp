@@ -23,10 +23,10 @@ sweep::sweep(string paramFile, scheduler * sched)
 //Eventually replace this by reading in from config file
     paramMin1 = 1.22;
     paramMax1 = 2.48;
-    numSteps1 = 5.;
+    numSteps1 = 50.;
     paramMin2 = 2.42;
     paramMax2 = 3.68;
-    numSteps2 = 5.;
+    numSteps2 = 50.;
     xparam = &(STR[0].theta);
     yparam = &(STR[0].phi);
     initialized = true;

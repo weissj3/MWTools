@@ -117,8 +117,7 @@ int scheduler::printFinishedRuns()
     //Handle runs that finished during update
     while(!printQueue.empty() and (printQueue.front())->isFinished())
     {
-        cout << "Printing" << endl;
-        if(!printQueue.front()->printLikelihood("list.txt"))  //Eventually take name from config file.
+        if(printQueue.front()->printLikelihood("list.txt"))  //Eventually take name from config file.
         {
             return -1;
         }
@@ -177,7 +176,10 @@ void scheduler::cleanup()
     }
     for(int i = 0; i < CPUInstances.size(); i++)
     {
-        (CPUInstances[i])->killRun();
+        if(CPUInstances[i])
+        {
+            (CPUInstances[i])->killRun();
+        }
     }
 
     //Clean up leftover dynamic memory

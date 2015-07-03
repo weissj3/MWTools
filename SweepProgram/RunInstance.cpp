@@ -34,12 +34,16 @@ runInstance::~runInstance()
 
 void runInstance::killRun()
 {
-    kill(runPid, SIGKILL);
+    if(isRunning())
+    {
+        cout << "Killing Process " << runPid << " with run id " << runId << endl;
+        kill(runPid, SIGKILL);
+    }
 }
 
 bool runInstance::isRunning()
 {
-    return runId;
+    return runPid;
 }
 
 bool runInstance::isFinished()
@@ -119,7 +123,6 @@ pid_t runInstance::run(string pathToSep, unsigned int Id, std::string commandLin
     stringstream tempstringstream;
     tempstringstream << Id;
     string directory = tempstringstream.str();
-    cout << "Creating directory: " << Id << endl;
     //Lots of system call so lots of error checking
     if(mkdir((char *) directory.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) and errno != EEXIST)
     {
@@ -200,6 +203,7 @@ int runInstance::updateStatus()
             infile.close();
             cout << likelihood << endl;
             runPid = 0;
+            runId = 0;
             return 0;
         }
 
