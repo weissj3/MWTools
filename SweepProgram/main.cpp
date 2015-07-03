@@ -31,8 +31,6 @@ int main (int argc, char* argv[])
 
         sweep * Sweep1 = new sweep(argv[1], Scheduler);
     
-        pid_t parentPid = getpid();
-        cout << "Parent PID: " << parentPid << endl;
         time_t time1, time2;
         time(&time1);
         if(Sweep1->run())

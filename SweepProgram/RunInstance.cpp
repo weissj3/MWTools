@@ -201,7 +201,6 @@ int runInstance::updateStatus()
             }
             infile >> likelihood;
             infile.close();
-            cout << likelihood << endl;
             runPid = 0;
             runId = 0;
             return 0;

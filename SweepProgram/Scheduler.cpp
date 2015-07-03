@@ -6,6 +6,7 @@ scheduler::scheduler()
 {
     useGPU = false;
     CoresFree = 0;
+    totalRuns = 0;
     GPUInstance = NULL;
 }
 
@@ -18,6 +19,7 @@ scheduler::scheduler(bool GPUapp, int numCores, string separationPath)
     }
     CoresFree = numCores;
 
+    totalRuns = 0;
     CPUInstances.resize(numCores, NULL);
     GPUInstance = NULL;
     pathToSep = separationPath;
@@ -34,6 +36,7 @@ int scheduler::requestRun(int wedge, background BG, const stream * STR, int numS
     if(newRun)
     {
         runQueue.push(newRun);
+        totalRuns++;
         return 0;
     }
     return -1;
@@ -93,6 +96,10 @@ int scheduler::startNewRuns()
         GPUInstance = runQueue.front();
         if(GPUInstance->runGPU(pathToSep, CPUInstances.size() + 1))
         {
+            if((runQueue.size() % totalRuns / 20) == 0)
+            {
+                outputProgress();
+            } 
             printQueue.push(GPUInstance);
             runQueue.pop();
         }
@@ -104,6 +111,11 @@ int scheduler::startNewRuns()
             CPUInstances[i] = runQueue.front();
             if(CPUInstances[i]->runCPU(pathToSep, i))
             {
+                if((runQueue.size() % totalRuns / 20) == 0)
+                {
+                    outputProgress();
+                }
+
 		printQueue.push(CPUInstances[i]);
                 runQueue.pop();
             }
@@ -194,3 +206,9 @@ void scheduler::cleanup()
         runQueue.pop();
     }
 }
+
+void scheduler::outputProgress()
+{
+    cout << 100. * ( 1. - (float)runQueue.size()/(float)totalRuns) << endl;
+}
+

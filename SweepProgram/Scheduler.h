@@ -15,6 +15,8 @@ private:
     std::queue <runInstance*> printQueue;
     std::string pathToSep;
 
+    unsigned int totalRuns;
+
     int updateRunning();
     int cleanUpFinished();
     int startNewRuns();
@@ -24,7 +26,8 @@ public:
     scheduler();
     scheduler(bool GPUapp, int numCores, std::string separationPath);
     ~scheduler();
-    
+   
+    void outputProgress(); 
     int requestRun(int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam);
     int update();
     void cleanup();
