@@ -119,6 +119,6 @@ public:
 
 };
 
-double * getParamByName(std::string paramName, background &BG, std::vector <stream> &STR);
+double * getParamByName(std::string paramName, background &BG, stream * STR);
 
 #endif

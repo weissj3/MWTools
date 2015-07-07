@@ -2,7 +2,7 @@
 
 using namespace std;
 
-sweep::sweep(string paramFile, scheduler * sched)
+sweep::sweep(string paramFile, scheduler * sched, string param1, double min1, double max1, double steps1, string param2, double min2, double max2, double steps2)
 {
     if(!sched)
     {
@@ -19,16 +19,19 @@ sweep::sweep(string paramFile, scheduler * sched)
     STR = NULL;
     init(infile);
 
+    paramMin1 = min1;
+    paramMax1 = max1;
+    numSteps1 = steps1;
+    paramMin2 = min2;
+    paramMax2 = max2;
+    numSteps2 = steps2;
+    xparam = getParamByName(param1, BG, STR);
+    yparam = getParamByName(param2, BG, STR);
+    if(!xparam or !yparam)
+    {
+        throw string("Could not find parameters by name");
+    }
 
-//Eventually replace this by reading in from config file
-    paramMin1 = 1.22;
-    paramMax1 = 2.48;
-    numSteps1 = 50.;
-    paramMin2 = 2.42;
-    paramMax2 = 3.68;
-    numSteps2 = 50.;
-    xparam = &(STR[0].theta);
-    yparam = &(STR[0].phi);
     initialized = true;
 }
 
@@ -141,17 +144,17 @@ void sweep::init(ifstream &infile)
 
 
 
-int sweep::run()
+int sweep::run(std::string outputFileName)
 {
     if(!initialized)
     {
         cerr << "Must initialized before running sweep" << endl;
         return -1;
     }
+    //Clean out old file
     ofstream output;
-    output.open("list.txt");
+    output.open(outputFileName.c_str());
     output.close();
-    ifstream infile;
 
     string a = "-a./sweepParams.lua", s = "-s../stars-15-sim-1Jun1.txt";
 
@@ -163,7 +166,7 @@ int sweep::run()
     {
         for(*yparam = paramMin2; *yparam < paramMax2; *yparam += (paramMax2-paramMin2)/(numSteps2 - 1))
         {
-            Scheduler->requestRun(wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
+            Scheduler->requestRun(outputFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
         }        
     }
 

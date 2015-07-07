@@ -6,6 +6,8 @@
 class runInstance
 {
 private:
+    std::string outputFileName;
+
     int wedge;
     background BG;
     std::vector <stream> STR;
@@ -24,7 +26,7 @@ private:
     
 public:
     runInstance();
-    runInstance(int w, background bg, const stream * str, int numStreams, area ar, double x, double y);
+    runInstance(std::string outFile, int w, background bg, const stream * str, int numStreams, area ar, double x, double y);
     ~runInstance();    
 
     pid_t getRunPid() { return runPid; }
@@ -39,7 +41,7 @@ public:
     
     void killRun();
     
-    int printLikelihood(std::string filename);
+    int printLikelihood();
     
 
 

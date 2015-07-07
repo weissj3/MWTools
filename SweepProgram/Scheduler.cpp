@@ -30,9 +30,9 @@ scheduler::~scheduler()
     cleanup();
 }
 
-int scheduler::requestRun(int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam)
+int scheduler::requestRun(string outFileName, int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam)
 {
-    runInstance * newRun = new runInstance(wedge, BG, STR, numStreams, AREA, xparam, yparam);
+    runInstance * newRun = new runInstance(outFileName, wedge, BG, STR, numStreams, AREA, xparam, yparam);
     if(newRun)
     {
         runQueue.push(newRun);
@@ -129,7 +129,7 @@ int scheduler::printFinishedRuns()
     //Handle runs that finished during update
     while(!printQueue.empty() and (printQueue.front())->isFinished())
     {
-        if(printQueue.front()->printLikelihood("list.txt"))  //Eventually take name from config file.
+        if(printQueue.front()->printLikelihood())  //Eventually take name from config file.
         {
             return -1;
         }

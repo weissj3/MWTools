@@ -28,7 +28,7 @@ public:
     ~scheduler();
    
     void outputProgress(); 
-    int requestRun(int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam);
+    int requestRun(std::string outFileName, int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam);
     int update();
     void cleanup();
 

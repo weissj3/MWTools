@@ -10,8 +10,9 @@ runInstance::runInstance()
     yparam = 0;
 }
 
-runInstance::runInstance(int w, background bg, const stream * str, int numStreams, area ar, double x, double y)
+runInstance::runInstance(string outFile, int w, background bg, const stream * str, int numStreams, area ar, double x, double y)
 {
+    outputFileName = outFile;
     wedge = w;
     likelihood = 1;
     runId = 0;
@@ -90,12 +91,13 @@ int runInstance::printParams()
 }
 
 
-int runInstance::printLikelihood(string filename)
+int runInstance::printLikelihood()
 {
     ofstream output;
-    output.open("list.txt", fstream::app);
+    output.open(outputFileName.c_str(), fstream::app);
     if(!output.is_open())
     {
+        cerr << "Failed to open output file " << outputFileName << endl;
         return -1;
     }
     output << xparam << " " << yparam << " " << setprecision(16) << likelihood <<  endl;
