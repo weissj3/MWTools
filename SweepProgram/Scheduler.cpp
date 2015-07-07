@@ -96,7 +96,7 @@ int scheduler::startNewRuns()
         GPUInstance = runQueue.front();
         if(GPUInstance->runGPU(pathToSep, CPUInstances.size() + 1))
         {
-            if((runQueue.size() % totalRuns / 20) == 0)
+            if((runQueue.size() % (totalRuns / 20)) == 0)
             {
                 outputProgress();
             } 
