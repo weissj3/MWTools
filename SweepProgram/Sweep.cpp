@@ -191,6 +191,7 @@ int sweep::run(std::string outputFileName)
     while(!schedulerStatus)
     {
         schedulerStatus = Scheduler->update();
+        sleep(2);
     }
 
     if(schedulerStatus < 0)
