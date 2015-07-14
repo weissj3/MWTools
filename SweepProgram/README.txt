@@ -1,6 +1,6 @@
 Writing a complicated program to complete a task that could easily be done with a simple script.  Should be fun.
 
-Features to add:
+Features:
 1)  Read in from config file to choose:
     - which/how many parameters to sweep over.
     - range and step size
