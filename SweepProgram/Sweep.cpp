@@ -162,12 +162,29 @@ int sweep::run(std::string outputFileName)
     int status = 0;
     int i = 0;
     //Step over parameters
-    for(*xparam = paramMin1; *xparam < paramMax1; *xparam += (paramMax1-paramMin1)/(numSteps1 - 1) )
+    if(numSteps1 == 0)
     {
-        for(*yparam = paramMin2; *yparam < paramMax2; *yparam += (paramMax2-paramMin2)/(numSteps2 - 1))
+        for(*yparam = paramMin2; *yparam <= paramMax2; *yparam += (paramMax2-paramMin2)/(numSteps2 - 1))
         {
             Scheduler->requestRun(outputFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
         }        
+    }
+    else if(numSteps2 == 0)
+    {
+        for(*xparam = paramMin1; *xparam <= paramMax1; *xparam += (paramMax1-paramMin1)/(numSteps1 - 1))
+        {
+            Scheduler->requestRun(outputFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
+        }     
+    }
+    else
+    {
+        for(*xparam = paramMin1; *xparam <= paramMax1; *xparam += (paramMax1-paramMin1)/(numSteps1 - 1) )
+        {
+            for(*yparam = paramMin2; *yparam < paramMax2; *yparam += (paramMax2-paramMin2)/(numSteps2 - 1))
+            {
+                Scheduler->requestRun(outputFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
+            }        
+        }
     }
 
     int schedulerStatus = 0;
