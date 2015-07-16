@@ -2,8 +2,13 @@
 
 using namespace std;
 
-sweep::sweep(string paramFile)
+sweep::sweep(string paramFile, scheduler * sched, string param1, double min1, double max1, double steps1, string param2, double min2, double max2, double steps2)
 {
+    if(!sched)
+    {
+        throw string("Sweeps require a scheduler");
+    }
+    Scheduler = sched;
 //Read in basic parameters from file
     ifstream infile;
     infile.open(paramFile.c_str());
@@ -14,16 +19,19 @@ sweep::sweep(string paramFile)
     STR = NULL;
     init(infile);
 
+    paramMin1 = min1;
+    paramMax1 = max1;
+    numSteps1 = steps1;
+    paramMin2 = min2;
+    paramMax2 = max2;
+    numSteps2 = steps2;
+    xparam = getParamByName(param1, BG, STR);
+    yparam = getParamByName(param2, BG, STR);
+    if(!xparam or !yparam)
+    {
+        throw string("Could not find parameters by name");
+    }
 
-//Eventually replace this by reading in from config file
-    paramMin1 = 1.22;
-    paramMax1 = 2.48;
-    numSteps1 = 5.;
-    paramMin2 = 2.42;
-    paramMax2 = 3.68;
-    numSteps2 = 5.;
-    xparam = &(STR[0].theta);
-    yparam = &(STR[0].phi);
     initialized = true;
 }
 
@@ -136,78 +144,64 @@ void sweep::init(ifstream &infile)
 
 
 
-int sweep::run(string pathToSep, string resultFileName)
+int sweep::run(std::string outputFileName)
 {
     if(!initialized)
     {
         cerr << "Must initialized before running sweep" << endl;
         return -1;
     }
+    //Clean out old file
     ofstream output;
-    output.open("list.txt");
-    ifstream infile;
+    output.open(outputFileName.c_str());
+    output.close();
 
-    string a = "-a./sweepParams.lua", s = "-s./stars-15-sim-1Jun1.txt";
+    string a = "-a./sweepParams.lua", s = "-s../stars-15-sim-1Jun1.txt";
 
     double result = 0;
     int status = 0;
     int i = 0;
     //Step over parameters
-    for(*xparam = paramMin1; *xparam < paramMax1; *xparam += (paramMax1-paramMin1)/numSteps1 )
+    if(numSteps1 == 0)
     {
-        for(*yparam = paramMin2; *yparam < paramMax2; *yparam += (paramMax2-paramMin2)/numSteps2)
+        for(*yparam = paramMin2; *yparam <= paramMax2; *yparam += (paramMax2-paramMin2)/(numSteps2 - 1))
         {
-            if(print_file())
-            {
-                cerr << "Failed to print parameter file for sweep" << endl;
-                return -1;
-            }
-            //Fork to run MW@home to evaluate point
-            pid_t id = fork();
-            if (id == 0)
-            {
-                execl((char *)pathToSep.c_str(), "milkyway_separation",  (char *)s.c_str(), (char *)a.c_str(), "-t", "-f", "-i", NULL);
-                exit(0);
-            }
-            else if (id < 0)
-            {
-                cerr << "Failed to fork" << endl;
-                return -1;
-            }
-            int childExitStatus;
-            //BLOCK until done running
-            waitpid( id, &childExitStatus, 0);
-            if( !WIFEXITED(childExitStatus) )
-            {
-                cerr << "waitpid() exited with an error: Status= " << WEXITSTATUS(childExitStatus) << endl;
-                return -1;
-            }
-            else if( WIFSIGNALED(childExitStatus) )
-            {
-                cerr << "waitpid() exited due to a signal: " << WTERMSIG(childExitStatus) << endl;
-                return -1;
-            }
-            //read in result from MW@home
-            infile.open("results.txt");
-            if(!infile.is_open())
-            {
-                cerr << "Failed to open results" << endl;
-                return -1;
-            }
-            infile >> result;
-            infile.close();
-            //Print Likelihood and corresponding params to file
-            output << *xparam << " " << *yparam << " " << setprecision(16) << result <<  endl;
-            if(i % (int)(numSteps1 * numSteps2/10) == 0)
-            {
-                cout << status << "0%" << endl;
-                status++;
-            }
-            i++;
+            Scheduler->requestRun(outputFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
         }        
     }
+    else if(numSteps2 == 0)
+    {
+        for(*xparam = paramMin1; *xparam <= paramMax1; *xparam += (paramMax1-paramMin1)/(numSteps1 - 1))
+        {
+            Scheduler->requestRun(outputFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
+        }     
+    }
+    else
+    {
+        for(*xparam = paramMin1; *xparam <= paramMax1; *xparam += (paramMax1-paramMin1)/(numSteps1 - 1) )
+        {
+            for(*yparam = paramMin2; *yparam < paramMax2; *yparam += (paramMax2-paramMin2)/(numSteps2 - 1))
+            {
+                Scheduler->requestRun(outputFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
+            }        
+        }
+    }
 
-    return 0;
+    int schedulerStatus = 0;
+    while(!schedulerStatus)
+    {
+        schedulerStatus = Scheduler->update();
+        sleep(2);
+    }
+
+    if(schedulerStatus < 0)
+    {
+        cerr << "Exited with error " << schedulerStatus << endl;
+    }
+
+    Scheduler->cleanup();
+
+    return schedulerStatus;
 
 }
 

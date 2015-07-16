@@ -25,6 +25,12 @@
 #include <locale>
 #include <cstring>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <list>
+#include <queue>
+#include <sstream>
+
 
 class comma_ctype : public std::ctype<char>
 {
@@ -113,6 +119,6 @@ public:
 
 };
 
-double * getParamByName(std::string paramName, background &BG, std::vector <stream> &STR);
+double * getParamByName(std::string paramName, background &BG, stream * STR);
 
 #endif

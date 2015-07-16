@@ -1,9 +1,9 @@
 CC=g++
-CFLAGS=-I. -Wall
+CFLAGS=-I. -Wall -g
 
-DEPS = Util.h Sweep.h
+DEPS = Util.h Sweep.h RunInstance.h Scheduler.h
 
-OBJ = main.o Sweep.o Util.o
+OBJ = main.o Sweep.o Util.o RunInstance.o Scheduler.o
 
 
 %.o: %.c $(DEPS)
