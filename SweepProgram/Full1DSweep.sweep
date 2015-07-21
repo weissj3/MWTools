@@ -1,0 +1,217 @@
+PathToSeparation: ../../milkyway_separation
+PathToParameters: params.lua
+GPU: true
+NumberOfCores: 1
+
+q
+Min: .3
+Max: .7
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepQ.txt
+
+r0
+Min: 2.88
+Max: 21.12
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepR0.txt
+
+
+epsilon1
+Min: -3.5
+Max: 0.5
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepEPS1.txt
+
+mu1
+Min: 169
+Max: 211
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepMU1.txt
+
+r1
+Min: 24.78
+Max: 43.02
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepR1.txt
+
+theta1
+Min: 1.22
+Max: 2.48
+Steps: 50
+phi1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepTHETA1.txt
+
+phi1
+Min: 2.42
+Max: 3.68
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepPHI1.txt
+
+sigma1
+Min: .5
+Max: 8.5
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepSIGMA1.txt
+
+
+
+
+epsilon2
+Min: -2.95
+Max: 1.95
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepEPS2.txt
+
+mu2
+Min: 189
+Max: 231
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepMU2.txt
+
+r2
+Min: 26.41
+Max: 44.65
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepR2.txt
+
+theta2
+Min: .87
+Max: 2.13
+Steps: 50
+phi1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepTHETA2.txt
+
+phi2
+Min: 2.55
+Max: 3.81
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepPHI2.txt
+
+sigma2
+Min: 6
+Max: 14
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepSIGMA2.txt
+
+
+
+
+epsilon3
+Min: -2.93
+Max: 1.93
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepEPS3.txt
+
+mu3
+Min: 159
+Max: 201
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepMU3.txt
+
+r3
+Min: 5.44
+Max: 23.68
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepR3.txt
+
+theta3
+Min: 1.34
+Max: 2.60
+Steps: 50
+phi1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepTHETA3.txt
+
+phi3
+Min: -1.03
+Max: .23
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepPHI3.txt
+
+sigma3
+Min: .16
+Max: 8.16
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 0
+Output: 1DSweepSIGMA3.txt
+
+
+
+
+
+
