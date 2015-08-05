@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-I. -Wall -g
+CXXFLAGS=-I. -Wall -g
 
 DEPS = Util.h Sweep.h RunInstance.h Scheduler.h
 
@@ -7,10 +7,10 @@ OBJ = main.o Sweep.o Util.o RunInstance.o Scheduler.o
 
 
 %.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -c -o $@ $< $(CXXFLAGS)
 
 main: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+	$(CC) -o $@ $^ $(CXXFLAGS)
 
 .PHONY: clean
 
