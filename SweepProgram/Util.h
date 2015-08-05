@@ -38,7 +38,7 @@ private:
     mask comma_table[table_size];
 
 public:
-    comma_ctype(size_t refs = 0) : ctype<char>(&comma_table[0], false, refs)
+    comma_ctype(size_t refs = 0) : std::ctype<char>(&comma_table[0], false, refs)
     {
         for(int i = 0; i < 256; i++)
         {
