@@ -1,0 +1,3 @@
+[submodule "Newby-tools"]
+	path = Newby-tools
+	url = https://github.com/weissj3/Newby-tools.git
