@@ -18,3 +18,6 @@ Metallicity Plots:
   -Working on a new project which requires mapping the metallicty of the Milky Way disk using our tracer stars.
   -Query used to get data will be provided after the work is done.
   -Need to add the ability to plot in galactic B and distance, where distance is calculated using absolute magnitude derived from metallicty and isochrones.
+Run Statistics:
+  -Looking into ways to better monitor runs from MW@home. Calculated the relavant statistics of a population in our optimization algorithms.
+  -Designed to work with raw output from tao_search_status script.
