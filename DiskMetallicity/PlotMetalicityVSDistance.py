@@ -25,7 +25,7 @@ if __name__ == "__main__":
             for i in range(len(ln)):
                 values[i].append(ln[i])
         
-        values = CutL(lbCuts[j][0], lbCuts[j][1], values)
+        values = met.CutL(lbCuts[j][0], lbCuts[j][1], values)
         
         dist = []
         delList = []
@@ -45,10 +45,26 @@ if __name__ == "__main__":
         print min(values[2]), max(values[2]), min(values[13]), max(values[13])
         plt.subplot(5,2,j)
         #plt.plot(map(float, values[12]), map(float, values[13]), 'o')
-        plt.scatter(map(float, values[2]), map(float, values[13]), c=map(float, values[21]), s=10.0, linewidth=.1, edgecolor='gray')
-        plt.imshow(met.averageMetallicities(values, [0., 4.5], [-30., 30.], [15, 24]), extent=[0., 4.5,-30, 30], interpolation='none', aspect='auto')    
+        averages = met.averageMetallicities(values, [0., 4.5], [-30., 30.], [15, 24])
+        x = []
+        for i in range(len(averages[0])):
+            x.append(float(i)/(len(averages[0])-1.) * 4.5)
+        count = 0
+        for i in averages:
+            plt.plot(x, i, 's', label=str(count))
+            count += 1
+        averageAverages = [0.0 for i in range(len(averages[0]))]
+        counts = [0.0 for i in range(len(averages[0]))]
+        for i in averages:
+            for k in range(len(i)):
+                if not ma.isnan(i[k]):
+                    counts[k] += 1.0
+                    averageAverages[k] += i[k]
+        for i in range(len(counts)):
+            if counts[i]:
+                averageAverages[i] = averageAverages[i]/counts[i]
+        plt.plot(x, averageAverages, '-', label="Average")
         plt.xlabel("$Distance (kpc)$")
-        plt.ylabel("B")
-        plt.title("Metallicity at B and Distance (l between %.1f and %.1f)" % (lbCuts[j][0], lbCuts[j][1]))
-        plt.colorbar()
+        plt.ylabel("Metalicity")
+        plt.title("Metallicity Versus Distance (l between %.1f and %.1f)" % (lbCuts[j][0], lbCuts[j][1]))
     plt.show()
