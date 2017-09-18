@@ -7,10 +7,10 @@ class scheduler
 {
 private:
 
-    bool useGPU;
+    int GPUsFree;
     int CoresFree;
     std::vector <runInstance*> CPUInstances;
-    runInstance * GPUInstance;
+    std::vector <runInstance*> GPUInstances;
     std::queue <runInstance*> runQueue;
     std::queue <runInstance*> printQueue;
     std::string pathToSep;
@@ -24,7 +24,7 @@ private:
 
 public:
     scheduler();
-    scheduler(bool GPUapp, int numCores, std::string separationPath);
+    scheduler(int numGPUs, int numCores, std::string separationPath);
     ~scheduler();
    
     void outputProgress(); 

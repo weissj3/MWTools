@@ -4,24 +4,18 @@ using namespace std;
 
 scheduler::scheduler()
 {
-    useGPU = false;
+    GPUsFree = 0;
     CoresFree = 0;
     totalRuns = 0;
-    GPUInstance = NULL;
 }
 
-scheduler::scheduler(bool GPUapp, int numCores, string separationPath)
+scheduler::scheduler(int numGPUs, int numCores, string separationPath)
 {
-    useGPU = GPUapp;
-    if(useGPU)
-    {
-        numCores -= 1;
-    }
+    GPUsFree = numGPUs;
     CoresFree = numCores;
-
     totalRuns = 0;
     CPUInstances.resize(numCores, NULL);
-    GPUInstance = NULL;
+    GPUInstances.resize(numGPUs, NULL);
     pathToSep = separationPath;
 }
 
@@ -45,14 +39,18 @@ int scheduler::requestRun(string outFileName, int wedge, background BG, const st
 int scheduler::updateRunning()
 {
     //Update all Current Runs
-    if(GPUInstance)
+        
+    for(unsigned int i = 0; i < GPUInstances.size(); i++)
     {
-        if(GPUInstance->updateStatus() < 0)
+        if(GPUInstances[i])
         {
-            return -1;
+            if((GPUInstances[i])->updateStatus() < 0)
+            {
+                return -1;
+            }
         }
     }
-    for(int i = 0; i < CPUInstances.size(); i++)
+    for(unsigned int i = 0; i < CPUInstances.size(); i++)
     {
         if(CPUInstances[i])
         {
@@ -68,14 +66,17 @@ int scheduler::updateRunning()
 int scheduler::cleanUpFinished()
 {
     //Handle runs that finished during update
-    if(GPUInstance)
+    for(unsigned int i = 0; i < GPUInstances.size(); i++)
     {
-        if(GPUInstance->isFinished())
+        if(GPUInstances[i])
         {
-            GPUInstance = NULL;
+            if((GPUInstances[i])->isFinished())
+            {
+                GPUInstances[i] = NULL;
+            }
         }
     }
-    for(int i = 0; i < CPUInstances.size(); i++)
+    for(unsigned int i = 0; i < CPUInstances.size(); i++)
     {
         if(CPUInstances[i])
         {
@@ -91,25 +92,28 @@ int scheduler::cleanUpFinished()
 int scheduler::startNewRuns()
 {
     //Handle runs that finished during update
-    if(!GPUInstance and useGPU and !runQueue.empty())
+    for(unsigned int i = 0; i < GPUInstances.size(); i++)
     {
-        GPUInstance = runQueue.front();
-        if(GPUInstance->runGPU(pathToSep, CPUInstances.size() + 1))
+        if(!GPUInstances[i] and !runQueue.empty())
         {
-            if((runQueue.size() % (totalRuns / 20)) == 0)
+            GPUInstances[i] = runQueue.front();
+            if(GPUInstances[i]->runGPU(pathToSep, i, i))
             {
-                outputProgress();
-            } 
-            printQueue.push(GPUInstance);
-            runQueue.pop();
+                 if((runQueue.size() % (totalRuns / 20)) == 0)
+                 {
+                     outputProgress();
+                 } 
+                 printQueue.push(GPUInstances[i]);
+                 runQueue.pop();
+            }
         }
     }
-    for(int i = 0; i < CPUInstances.size(); i++)
+    for(unsigned int i = 0; i < CPUInstances.size(); i++)
     {
         if(!CPUInstances[i] and !runQueue.empty())
         {
             CPUInstances[i] = runQueue.front();
-            if(CPUInstances[i]->runCPU(pathToSep, i))
+            if(CPUInstances[i]->runCPU(pathToSep, i + GPUInstances.size()))
             {
                 if((runQueue.size() % totalRuns / 20) == 0)
                 {
@@ -162,9 +166,9 @@ int scheduler::update()
     {
         return result;
     }
-    if(printQueue.empty() and runQueue.empty() and !GPUInstance)
+    if(printQueue.empty() and runQueue.empty())
     {
-        for(int i = 0; i < CPUInstances.size(); i++)
+        for(unsigned int i = 0; i < CPUInstances.size(); i++)
         {
             if(CPUInstances[i])
             {
@@ -182,11 +186,14 @@ int scheduler::update()
 void scheduler::cleanup()
 {
     //Kill Child Processes
-    if(GPUInstance)
+    for(unsigned int i = 0; i < GPUInstances.size(); i++)
     {
-        GPUInstance->killRun();
+        if(GPUInstances[i])
+        {
+            GPUInstances[i]->killRun();
+        }
     }
-    for(int i = 0; i < CPUInstances.size(); i++)
+    for(unsigned int i = 0; i < CPUInstances.size(); i++)
     {
         if(CPUInstances[i])
         {

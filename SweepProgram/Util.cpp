@@ -7,13 +7,13 @@ double * getParamByName(std::string paramName, background &BG, stream * STR)
         std::cerr << "Tried to get param without initializing streams" << std::endl;
         return NULL;
     }
-    if(paramName == "q")
-    {
-        return &(BG.q);
-    }
-    else if(paramName == "r0")
+    if(paramName == "epsilonBG")
     {
         return &(BG.r0);
+    }
+    else if(paramName == "q")
+    {
+        return &(BG.q);
     }
     else if(paramName == "epsilon1")
     {

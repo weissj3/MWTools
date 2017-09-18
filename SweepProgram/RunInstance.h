@@ -37,7 +37,7 @@ public:
     int updateStatus();
 
     pid_t runCPU(std::string pathToSep, unsigned int Id);
-    pid_t runGPU(std::string pathToSep, unsigned int Id);
+    pid_t runGPU(std::string pathToSep, unsigned int Id, unsigned int gpuNum);
     
     void killRun();
     

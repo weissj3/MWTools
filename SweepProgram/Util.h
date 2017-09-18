@@ -90,8 +90,8 @@ public:
     
     void print(std::ofstream & ostr)
     {
-        ostr << "q  = " << std::setprecision(16) << q 
-        << ", \n   r0 = " << std::setprecision(16) << r0;
+        ostr << "epsilon  = " << std::setprecision(16) << r0
+        << ", \n   q = " << std::setprecision(16) << q;
     }
 };
 

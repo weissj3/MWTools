@@ -1,5 +1,5 @@
 CC=g++
-CXXFLAGS=-I. -Wall -g
+CXXFLAGS=-I. -Wall -g -std=c++11
 
 DEPS = Util.h Sweep.h RunInstance.h Scheduler.h
 

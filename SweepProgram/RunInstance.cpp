@@ -1,4 +1,5 @@
 #include "RunInstance.h"
+#include <string>
 
 using namespace std;
 
@@ -111,9 +112,9 @@ pid_t runInstance::runCPU(string pathToSep, unsigned int Id)
     return run(pathToSep, Id, command);
 }
 
-pid_t runInstance::runGPU(string pathToSep, unsigned int Id)
+pid_t runInstance::runGPU(string pathToSep, unsigned int Id, unsigned int gpuNum)
 {
-    string command = "-c";
+    string command = "--device=" + std::to_string(gpuNum);
     return run(pathToSep, Id, command);
 }
 
@@ -157,7 +158,7 @@ pid_t runInstance::run(string pathToSep, unsigned int Id, std::string commandLin
             cerr << "Failed to print parameter file for sweep" << endl;
             exit(-1);
         }
-        execl("./milkyway_separation", "milkyway_separation",  (char *)s.c_str(), (char *)a.c_str(), "-t", "-f", "-i", (char *) commandLine.c_str(), NULL);
+        execl("./milkyway_separation", "milkyway_separation",  (char *)s.c_str(), (char *)a.c_str(), "-c", "-t", "-f", "-i", (char *) commandLine.c_str(), NULL);
         exit(0);
     }
     else if (runPid < 0)
