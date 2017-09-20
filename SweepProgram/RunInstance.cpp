@@ -11,9 +11,10 @@ runInstance::runInstance()
     yparam = 0;
 }
 
-runInstance::runInstance(string outFile, int w, background bg, const stream * str, int numStreams, area ar, double x, double y)
+runInstance::runInstance(string outFile, string starFileName, int w, background bg, const stream * str, int numStreams, area ar, double x, double y)
 {
     outputFileName = outFile;
+    StarFileName = starFileName;
     wedge = w;
     likelihood = 1;
     runId = 0;
@@ -147,7 +148,7 @@ pid_t runInstance::run(string pathToSep, unsigned int Id, std::string commandLin
     runPid = fork();
     if (runPid == 0)
     {
-        string a = "-a./sweepParams.lua", s = "-s../stars-15-sim-1Jun1.txt";  //Eventually will be part of config file
+        string a = "-a./sweepParams.lua", s = "-s../" + StarFileName;  //Eventually will be part of config file
         if(chdir((char *) directory.c_str()))
         {
             cerr << "Failed to change to directory " << directory << endl;

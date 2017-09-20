@@ -1,5 +1,6 @@
 PathToSeparation: ../../milkyway_separation
 PathToParameters: params.lua
+StarFile: stars-19.txt
 GPU: false
 NumberOfCores: 7
 

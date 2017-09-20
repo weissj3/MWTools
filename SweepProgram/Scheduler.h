@@ -9,6 +9,7 @@ private:
 
     int GPUsFree;
     int CoresFree;
+    int RunsPerGPU;
     std::vector <runInstance*> CPUInstances;
     std::vector <runInstance*> GPUInstances;
     std::queue <runInstance*> runQueue;
@@ -24,11 +25,11 @@ private:
 
 public:
     scheduler();
-    scheduler(int numGPUs, int numCores, std::string separationPath);
+    scheduler(int numGPUs, int runsPerGPU, int numCores, std::string separationPath);
     ~scheduler();
    
     void outputProgress(); 
-    int requestRun(std::string outFileName, int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam);
+    int requestRun(std::string outFileName, std::string starFileName, int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam);
     int update();
     void cleanup();
 

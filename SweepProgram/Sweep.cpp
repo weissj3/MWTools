@@ -2,13 +2,14 @@
 
 using namespace std;
 
-sweep::sweep(string paramFile, scheduler * sched, string param1, double min1, double max1, double steps1, string param2, double min2, double max2, double steps2)
+sweep::sweep(string paramFile, string starFileName, scheduler * sched, string param1, double min1, double max1, double steps1, string param2, double min2, double max2, double steps2)
 {
     if(!sched)
     {
         throw string("Sweeps require a scheduler");
     }
     Scheduler = sched;
+    StarFileName = starFileName;
 //Read in basic parameters from file
     ifstream infile;
     infile.open(paramFile.c_str());
@@ -156,24 +157,19 @@ int sweep::run(std::string outputFileName)
     output.open(outputFileName.c_str());
     output.close();
 
-    string a = "-a./sweepParams.lua", s = "-s../stars-15-sim-1Jun1.txt";
-
-    double result = 0;
-    int status = 0;
-    int i = 0;
     //Step over parameters
     if(numSteps1 == 0)
     {
         for(*yparam = paramMin2; *yparam <= paramMax2; *yparam += (paramMax2-paramMin2)/(numSteps2 - 1))
         {
-            Scheduler->requestRun(outputFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
+            Scheduler->requestRun(outputFileName, StarFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
         }        
     }
     else if(numSteps2 == 0)
     {
         for(*xparam = paramMin1; *xparam <= paramMax1; *xparam += (paramMax1-paramMin1)/(numSteps1 - 1))
         {
-            Scheduler->requestRun(outputFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
+            Scheduler->requestRun(outputFileName, StarFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
         }     
     }
     else
@@ -182,7 +178,7 @@ int sweep::run(std::string outputFileName)
         {
             for(*yparam = paramMin2; *yparam < paramMax2; *yparam += (paramMax2-paramMin2)/(numSteps2 - 1))
             {
-                Scheduler->requestRun(outputFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
+                Scheduler->requestRun(outputFileName, StarFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
             }        
         }
     }

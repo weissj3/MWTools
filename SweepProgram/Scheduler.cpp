@@ -6,16 +6,18 @@ scheduler::scheduler()
 {
     GPUsFree = 0;
     CoresFree = 0;
+    RunsPerGPU = 0;
     totalRuns = 0;
 }
 
-scheduler::scheduler(int numGPUs, int numCores, string separationPath)
+scheduler::scheduler(int numGPUs, int runsPerGPU, int numCores, string separationPath)
 {
     GPUsFree = numGPUs;
     CoresFree = numCores;
+    RunsPerGPU = runsPerGPU;
     totalRuns = 0;
     CPUInstances.resize(numCores, NULL);
-    GPUInstances.resize(numGPUs, NULL);
+    GPUInstances.resize(numGPUs * RunsPerGPU, NULL);
     pathToSep = separationPath;
 }
 
@@ -24,9 +26,9 @@ scheduler::~scheduler()
     cleanup();
 }
 
-int scheduler::requestRun(string outFileName, int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam)
+int scheduler::requestRun(string outFileName, string starFileName, int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam)
 {
-    runInstance * newRun = new runInstance(outFileName, wedge, BG, STR, numStreams, AREA, xparam, yparam);
+    runInstance * newRun = new runInstance(outFileName, starFileName, wedge, BG, STR, numStreams, AREA, xparam, yparam);
     if(newRun)
     {
         runQueue.push(newRun);
@@ -97,7 +99,7 @@ int scheduler::startNewRuns()
         if(!GPUInstances[i] and !runQueue.empty())
         {
             GPUInstances[i] = runQueue.front();
-            if(GPUInstances[i]->runGPU(pathToSep, i, i))
+            if(GPUInstances[i]->runGPU(pathToSep, i, i/RunsPerGPU))
             {
                  if((runQueue.size() % (totalRuns / 20)) == 0)
                  {

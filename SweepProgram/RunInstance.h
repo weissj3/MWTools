@@ -7,7 +7,7 @@ class runInstance
 {
 private:
     std::string outputFileName;
-
+    std::string StarFileName;
     int wedge;
     background BG;
     std::vector <stream> STR;
@@ -26,7 +26,7 @@ private:
     
 public:
     runInstance();
-    runInstance(std::string outFile, int w, background bg, const stream * str, int numStreams, area ar, double x, double y);
+    runInstance(std::string outFile, std::string starFileName, int w, background bg, const stream * str, int numStreams, area ar, double x, double y);
     ~runInstance();    
 
     pid_t getRunPid() { return runPid; }
