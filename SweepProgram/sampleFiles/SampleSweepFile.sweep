@@ -1,0 +1,35 @@
+PathToSeparation: ../../milkyway_separation
+PathToParameters: params.lua
+StarFile: stars-19.txt
+GPU: false
+NumberOfCores: 7
+
+phi1
+Min: 1.22
+Max: 2.48
+Steps: 50
+theta1
+Min: 2.42
+Max: 3.68
+Steps: 50
+Output: list.txt
+
+phi2
+Min: .87
+Max: 2.13
+Steps: 50
+theta2
+Min: 2.55
+Max: 3.81
+Steps: 50
+Output: list2.txt
+
+phi3
+Min: 1.34
+Max: 2.60
+Steps: 50
+theta3
+Min: -1.03
+Max: .23
+Steps: 50
+Output: list3.txt
