@@ -42,7 +42,7 @@ int main (int argc, char* argv[])
     cout << "Using: " << sepPath << ", " << paramsPath << "," << starFileName << ", " << NumGPUs << ", " << numCores << endl;
     clock_t timer;
     scheduler * Scheduler;
-    sweep * Sweep;
+    hessian * Sweep;
     while(!infile.eof())
     {
         string pName1, pName2, outputFileName;
@@ -54,7 +54,7 @@ int main (int argc, char* argv[])
         Scheduler = new scheduler(NumGPUs, RunsPerGPU, numCores, sepPath);
         try
         {
-            Sweep = new sweep(paramsPath, starFileName, Scheduler, pName1, min1, max1, step1, pName2, min2, max2, step2);
+            Sweep = new hessian(paramsPath, starFileName, Scheduler, pName1, min1, max1, step1, pName2, min2, max2, step2);
         }
         catch(string error)
         {

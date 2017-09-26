@@ -26,13 +26,14 @@ scheduler::~scheduler()
     cleanup();
 }
 
-int scheduler::requestRun(string outFileName, string starFileName, int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam)
+int scheduler::requestRun(runInstance * newRun)
 {
-    runInstance * newRun = new runInstance(outFileName, starFileName, wedge, BG, STR, numStreams, AREA, xparam, yparam);
     if(newRun)
     {
+        newRun->setRunId(totalRuns);
         runQueue.push(newRun);
         totalRuns++;
+        finishedRuns.push_back(NULL); 
         return 0;
     }
     return -1;
@@ -74,6 +75,7 @@ int scheduler::cleanUpFinished()
         {
             if((GPUInstances[i])->isFinished())
             {
+                finishedRuns[GPUInstances[i]->getId()] = GPUInstances[i];
                 GPUInstances[i] = NULL;
             }
         }
@@ -84,6 +86,7 @@ int scheduler::cleanUpFinished()
         {
             if((CPUInstances[i])->isFinished())
             {
+                finishedRuns[CPUInstances[i]->getId()] = CPUInstances[i];
                 CPUInstances[i] = NULL;
             }
         }
@@ -105,7 +108,6 @@ int scheduler::startNewRuns()
                  {
                      outputProgress();
                  } 
-                 printQueue.push(GPUInstances[i]);
                  runQueue.pop();
             }
         }
@@ -121,26 +123,9 @@ int scheduler::startNewRuns()
                 {
                     outputProgress();
                 }
-
-		printQueue.push(CPUInstances[i]);
                 runQueue.pop();
             }
         }
-    }
-    return 0;
-}
-
-int scheduler::printFinishedRuns()
-{
-    //Handle runs that finished during update
-    while(!printQueue.empty() and (printQueue.front())->isFinished())
-    {
-        if(printQueue.front()->printLikelihood())  //Eventually take name from config file.
-        {
-            return -1;
-        }
-        delete printQueue.front();
-        printQueue.pop();
     }
     return 0;
 }
@@ -163,13 +148,16 @@ int scheduler::update()
     {
         return result;
     }
-    result = printFinishedRuns();
-    if(result < 0)
+    if(runQueue.empty())
     {
-        return result;
-    }
-    if(printQueue.empty() and runQueue.empty())
-    {
+        for(unsigned int i = 0; i < GPUInstances.size(); i++)
+        {
+            if(GPUInstances[i])
+            {
+                return 0;
+            }
+        }
+
         for(unsigned int i = 0; i < CPUInstances.size(); i++)
         {
             if(CPUInstances[i])
@@ -204,10 +192,13 @@ void scheduler::cleanup()
     }
 
     //Clean up leftover dynamic memory
-    while(!printQueue.empty())
+    for(unsigned int i = 0; i < finishedRuns.size(); i++) 
     {
-        delete printQueue.front();
-        printQueue.pop();
+        if(finishedRuns[i])
+        {
+            delete finishedRuns[i];
+            finishedRuns[i] = NULL;
+        }
     }
     while(!runQueue.empty())
     {

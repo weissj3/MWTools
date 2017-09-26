@@ -162,14 +162,14 @@ int sweep::run(std::string outputFileName)
     {
         for(*yparam = paramMin2; *yparam <= paramMax2; *yparam += (paramMax2-paramMin2)/(numSteps2 - 1))
         {
-            Scheduler->requestRun(outputFileName, StarFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
+            Scheduler->requestRun(new sweepRunInstance(outputFileName, StarFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam));
         }        
     }
     else if(numSteps2 == 0)
     {
         for(*xparam = paramMin1; *xparam <= paramMax1; *xparam += (paramMax1-paramMin1)/(numSteps1 - 1))
         {
-            Scheduler->requestRun(outputFileName, StarFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
+            Scheduler->requestRun(new sweepRunInstance(outputFileName, StarFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam));
         }     
     }
     else
@@ -178,7 +178,7 @@ int sweep::run(std::string outputFileName)
         {
             for(*yparam = paramMin2; *yparam < paramMax2; *yparam += (paramMax2-paramMin2)/(numSteps2 - 1))
             {
-                Scheduler->requestRun(outputFileName, StarFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam);
+                Scheduler->requestRun(new sweepRunInstance(outputFileName, StarFileName, wedge, BG, STR, numStreams, AREA, *xparam, *yparam));
             }        
         }
     }
@@ -193,6 +193,14 @@ int sweep::run(std::string outputFileName)
     if(schedulerStatus < 0)
     {
         cerr << "Exited with error " << schedulerStatus << endl;
+    }
+    else
+    {
+        vector <runInstance*> results = Scheduler->getFinishedRuns();
+        for(int i = 0; i < results.size(); i++)
+        {
+            ((sweepRunInstance*) results[i])->printLikelihood();
+        }
     }
 
     Scheduler->cleanup();

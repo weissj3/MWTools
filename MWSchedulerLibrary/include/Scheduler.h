@@ -13,7 +13,7 @@ private:
     std::vector <runInstance*> CPUInstances;
     std::vector <runInstance*> GPUInstances;
     std::queue <runInstance*> runQueue;
-    std::queue <runInstance*> printQueue;
+    std::vector <runInstance*> finishedRuns;
     std::string pathToSep;
 
     unsigned int totalRuns;
@@ -21,7 +21,6 @@ private:
     int updateRunning();
     int cleanUpFinished();
     int startNewRuns();
-    int printFinishedRuns();
 
 public:
     scheduler();
@@ -29,10 +28,12 @@ public:
     ~scheduler();
    
     void outputProgress(); 
-    int requestRun(std::string outFileName, std::string starFileName, int wedge, background BG, const stream * STR, int numStreams, area AREA, double xparam, double yparam);
+    int requestRun(runInstance* newRun);
+    
     int update();
     void cleanup();
-
+    std::vector <runInstance*> getFinishedRuns() { return finishedRuns; }
+    void clearFinishedRuns();
 
 };
 

@@ -18,4 +18,4 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -g")
 
 add_subdirectory(MWSchedulerLibrary)
 add_subdirectory(SweepProgram)
-add_subdirectory(HessianCode)
+#add_subdirectory(HessianCode)

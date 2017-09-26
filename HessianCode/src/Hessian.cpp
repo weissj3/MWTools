@@ -2,7 +2,7 @@
 
 using namespace std;
 
-sweep::sweep(string paramFile, string starFileName, scheduler * sched, string param1, double min1, double max1, double steps1, string param2, double min2, double max2, double steps2)
+hessian::hessian(string paramFile, string starFileName, scheduler * sched, const vector <double> &stepSizes)
 {
     if(!sched)
     {
@@ -20,28 +20,15 @@ sweep::sweep(string paramFile, string starFileName, scheduler * sched, string pa
     STR = NULL;
     init(infile);
 
-    paramMin1 = min1;
-    paramMax1 = max1;
-    numSteps1 = steps1;
-    paramMin2 = min2;
-    paramMax2 = max2;
-    numSteps2 = steps2;
-    xparam = getParamByName(param1, BG, STR);
-    yparam = getParamByName(param2, BG, STR);
-    if(!xparam or !yparam)
-    {
-        throw string("Could not find parameters by name");
-    }
-
     initialized = true;
 }
 
-sweep::~sweep()
+hessian::~hessian()
 {
    cleanup();
 }
 
-void sweep::cleanup()
+void hessian::cleanup()
 {
     if(initialized)
     {    
@@ -54,10 +41,10 @@ void sweep::cleanup()
 }
 
 //Print parameter file for current step.
-int sweep::print_file()
+int hessian::print_file()
 {
     ofstream output;
-    output.open("sweepParams.lua");
+    output.open("hessianParams.lua");
     if(!output.is_open())
     {
         cerr << "Unable to open file to print" << endl;
@@ -87,7 +74,7 @@ int sweep::print_file()
 }
 
 //Designed to read in from lua file without actually using lua (maybe actually integrate lua interpreter later)
-void sweep::init(ifstream &infile)
+void hessian::init(ifstream &infile)
 {
     vector<stream> STRTMP;
     string temp;
@@ -145,11 +132,11 @@ void sweep::init(ifstream &infile)
 
 
 
-int sweep::run(std::string outputFileName)
+int hessian::run(std::string outputFileName)
 {
     if(!initialized)
     {
-        cerr << "Must initialized before running sweep" << endl;
+        cerr << "Must initialized before running hessian" << endl;
         return -1;
     }
     //Clean out old file

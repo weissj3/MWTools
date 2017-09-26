@@ -7,13 +7,10 @@ runInstance::runInstance()
 {
     likelihood = 1;
     runId = 0;
-    xparam = 0;
-    yparam = 0;
 }
 
-runInstance::runInstance(string outFile, string starFileName, int w, background bg, const stream * str, int numStreams, area ar, double x, double y)
+runInstance::runInstance(string starFileName, int w, background bg, const stream * str, int numStreams, area ar)
 {
-    outputFileName = outFile;
     StarFileName = starFileName;
     wedge = w;
     likelihood = 1;
@@ -26,8 +23,6 @@ runInstance::runInstance(string outFile, string starFileName, int w, background 
     }
 
     AREA = ar;
-    xparam = x;
-    yparam = y;
 }
     
 runInstance::~runInstance()
@@ -88,21 +83,6 @@ int runInstance::printParams()
     output << "}\n\narea = {\n   ";
     AREA.print(output);     
     output << "\n   }\n}\n";
-    output.close();
-    return 0;
-}
-
-
-int runInstance::printLikelihood()
-{
-    ofstream output;
-    output.open(outputFileName.c_str(), fstream::app);
-    if(!output.is_open())
-    {
-        cerr << "Failed to open output file " << outputFileName << endl;
-        return -1;
-    }
-    output << xparam << " " << yparam << " " << setprecision(16) << likelihood <<  endl;
     output.close();
     return 0;
 }

@@ -1,5 +1,6 @@
 #ifndef _SWEEP_H_
 #define _SWEEP_H_
+#include "SweepRunInstance.h"
 #include "Scheduler.h"
 
 class sweep
