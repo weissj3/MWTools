@@ -25,7 +25,7 @@ runInstance::runInstance(string starFileName, int w, background bg, const stream
     Params = parameters(w, bg, tmpstreams, ar);
 }
     
-runInstance::runInstance(std::string starFileName, parameters params)
+runInstance::runInstance(string starFileName, parameters params)
 {
     StarFileName = starFileName;
     Params = params;

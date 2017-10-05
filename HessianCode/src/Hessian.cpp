@@ -13,6 +13,7 @@ hessian::hessian(string paramFile, string starFileName, scheduler * sched, const
     StarFileName = starFileName;
 //Read in basic parameters from file
     Params = parameters(paramFile);
+    StepSizes = stepSizes;
     initialized = true;
 }
 
@@ -42,7 +43,7 @@ int hessian::run(std::string outputFileName)
     //Queue up all of the likelihood calculations for the second derivatives
     for(int i = 0; i < Params.numParams(); i++)
     {
-        for(int j = i; i < Params.numParams(); j++)
+        for(int j = i; j < Params.numParams(); j++)
         {
             parameters tempParams = Params;
             tempParams[i] = tempParams[i] + StepSizes[i];

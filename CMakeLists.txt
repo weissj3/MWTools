@@ -1,6 +1,7 @@
 project(MWTools)
 
 cmake_minimum_required(VERSION 2.6)
+SET(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 set(MWTOOLS_ROOT ${PROJECT_BINARY_DIR})
 list(INSERT CMAKE_PREFIX_PATH 0 ${MWTOOLS_ROOT})
