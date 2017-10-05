@@ -1,0 +1,14 @@
+PathToSeparation: ../../milkyway_separation
+PathToParameters: params.lua 
+StarFile: stars-19.txt
+OutputFile: HessianResults.txt
+NumGPUs: 8
+NumberOfCores: 0
+
+<Steps>
+.001 0.1
+0.5 7.0 1.0 0.1 0.1 1.0
+0.5 7.0 1.0 0.1 0.1 2.0
+0.5 7.0 1.0 0.1 0.1 2.0
+</Steps>
+

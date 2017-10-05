@@ -7,15 +7,11 @@ class runInstance
 {
 private:
     std::string StarFileName;
-    int wedge;
-    background BG;
-    std::vector <stream> STR;
-    area AREA;
-
+    
     pid_t runPid;
+   
+    parameters Params;
 
-
-    int printParams();
     pid_t run(std::string pathToSep, unsigned int Id, std::string commandLine);
 
 protected:
@@ -25,6 +21,7 @@ protected:
 public:
     runInstance();
     runInstance(std::string starFileName, int w, background bg, const stream * str, int numStreams, area ar);
+    runInstance(std::string starFileName, parameters params);
     ~runInstance();    
 
     pid_t getRunPid() { return runPid; }

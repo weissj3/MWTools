@@ -18,4 +18,4 @@ set(HESSIANERRORS_SRC        src/main.cpp
 add_executable(${PROJECT_NAME} ${HESSIANERRORS_SRC})
 
 target_link_libraries(${PROJECT_NAME} MWSchedulerLibrary
-                                      ${ARMADILLO_INCLUDE_DIRS})
+                                      ${ARMADILLO_LIBRARIES})

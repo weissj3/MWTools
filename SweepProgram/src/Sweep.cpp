@@ -96,7 +96,7 @@ void sweep::init(ifstream &infile)
 
     infile >> temp >> temp >> wedge
             >> temp >> temp >> temp
-            >> temp >> temp >> BG.r0
+            >> temp >> temp >> BG.epsilon
             >> temp >> temp >> BG.q
             >> temp
             >> temp >> temp >> temp;

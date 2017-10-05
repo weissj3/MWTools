@@ -12,19 +12,25 @@ runInstance::runInstance()
 runInstance::runInstance(string starFileName, int w, background bg, const stream * str, int numStreams, area ar)
 {
     StarFileName = starFileName;
-    wedge = w;
     likelihood = 1;
     runId = 0;
-    BG = bg;
-
-    for(int i = 0; i < numStreams; i++)
+    vector <stream> tmpstreams;
+    if (str)
     {
-        STR.push_back(str[i]);
+        for(int i = 0; i < numStreams; i++)
+        {
+            tmpstreams.push_back(str[i]);
+        }
     }
-
-    AREA = ar;
+    Params = parameters(w, bg, tmpstreams, ar);
 }
     
+runInstance::runInstance(std::string starFileName, parameters params)
+{
+    StarFileName = starFileName;
+    Params = params;
+}
+
 runInstance::~runInstance()
 {
     killRun();
@@ -52,39 +58,6 @@ bool runInstance::isFinished()
     }
 
     return false;
-}
-
-//Print a parameter file for the run.
-int runInstance::printParams()
-{
-    ofstream output;
-    output.open("sweepParams.lua");
-    if(!output.is_open())
-    {
-        cerr << "Unable to open file to print" << endl;
-        return -1;
-    }
-    output << "\n wedge = " << wedge 
-            << " \n \n background = { \n   ";
-    BG.print(output);            
-    output << "\n } \n \n streams = { \n";
-    for(int i = 0; i < STR.size(); i++)
-    {
-        STR[i].print(output);
-        if(i != STR.size()-1)
-        {
-            output << ",\n\n";
-        }
-        else
-        {
-            output << "\n";
-        }
-    }
-    output << "}\n\narea = {\n   ";
-    AREA.print(output);     
-    output << "\n   }\n}\n";
-    output.close();
-    return 0;
 }
 
 pid_t runInstance::runCPU(string pathToSep, unsigned int Id)
@@ -134,7 +107,7 @@ pid_t runInstance::run(string pathToSep, unsigned int Id, std::string commandLin
             cerr << "Failed to change to directory " << directory << endl;
             exit(-1);
         }
-        if(printParams())
+        if(Params.print("sweepParams.lua"))
         {
             cerr << "Failed to print parameter file for sweep" << endl;
             exit(-1);

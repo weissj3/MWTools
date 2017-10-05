@@ -83,15 +83,28 @@ public:
 class background
 {
 public:
+    double epsilon;
     double q;
-    double r0;
     background() {}
-    background(double Q, double R0) : q(Q), r0(R0) {}
+    background(double E, double Q) : epsilon(E), q(Q) {}
     
     void print(std::ofstream & ostr)
     {
-        ostr << "epsilon  = " << std::setprecision(16) << r0
+        ostr << "epsilon  = " << std::setprecision(16) << epsilon
         << ", \n   q = " << std::setprecision(16) << q;
+    }
+    double& operator[](unsigned int num)
+    {
+         switch(num)
+         {
+             case 0:
+                  return epsilon;
+             case 1:
+                  return q;
+             default:
+                  throw std::string("Unable to find corresponding parameter.");
+                  break;
+         }
     }
 };
 
@@ -116,6 +129,89 @@ public:
             << ",\n      sigma   = " << std::setprecision(17) << sigma 
             << "\n   }";
     }
+    double& operator[](unsigned int num)
+    {
+         switch(num)
+         {
+             case 0:
+                  return epsilon;
+             case 1:
+                  return mu;
+             case 2:
+                  return r;
+             case 3:
+                  return theta;
+             case 4:
+                  return phi;
+             case 5:
+                  return sigma;
+             default:
+                  throw std::string("Unable to find corresponding parameter.");
+                  break;
+         }
+    }
+};
+
+class parameters
+{
+public:
+    int wedge;
+    background BG;
+    std::vector <stream> STR;
+    area AR;
+    
+    parameters() {}
+    parameters(int w, const std::vector <double> &values, area ar)
+    {
+        wedge = w;
+        if( values.size() >= 2 )
+        {
+            BG = background(values[0], values[1]);
+        }
+        int i = 2;
+        while( i < values.size() )
+        {
+            if( values.size() >= i + 6 )
+            {
+                STR.push_back(stream(values[i], values[i+1], values[i+2], values[i+3], values[i+4], values[i+5]));
+            }
+            i += 6;
+        }
+        AR = ar;
+    }
+    parameters(int w, background bg, const std::vector <stream> &str, area ar)
+    {
+        wedge = w;
+        BG = bg;
+        STR = str;
+        AR = ar;
+    }
+    parameters(std::string inFileName);
+
+    int print(std::string fileName);
+    void print(std::ofstream & ostr);
+
+    int numParams() { return 2 + 6 * STR.size(); }
+    double& operator[](unsigned int num)
+    {
+        if(num <2)
+        {
+            return BG[num];
+        }
+        else
+        {
+            num -= 2;
+            unsigned int strNum = 0;
+            while( num > 5 && strNum < STR.size())
+            {
+                num -= 6;
+                strNum += 1;
+            }
+            return STR[strNum][num];
+        }
+    }
+
+
 
 };
 

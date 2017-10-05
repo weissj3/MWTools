@@ -10,20 +10,13 @@ class hessian
 private:
     scheduler * Scheduler;
 
-    int wedge;
-    area AREA;
-    background BG;
-    stream * STR;
-    int numStreams;
-
+    parameters Params;
+    
     std::string StarFileName;
 
     std::vector <double> StepSizes;
 
     bool initialized; 
-
-    int print_file();
-    void init(std::ifstream &infile);
 
 public:
     ~hessian();
