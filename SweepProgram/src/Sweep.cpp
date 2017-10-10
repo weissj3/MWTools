@@ -199,7 +199,14 @@ int sweep::run(std::string outputFileName)
         vector <runInstance*> results = Scheduler->getFinishedRuns();
         for(int i = 0; i < results.size(); i++)
         {
-            ((sweepRunInstance*) results[i])->printLikelihood();
+            if(results[i])
+            {
+                ((sweepRunInstance*) results[i])->printLikelihood();
+            }
+            else
+            {
+                cerr << "Missing Sweep Result " << i << endl;
+            }
         }
     }
 

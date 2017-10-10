@@ -13,6 +13,7 @@ private:
     parameters Params;
 
     pid_t run(std::string pathToSep, unsigned int Id, std::string commandLine);
+    unsigned int coreId;
 
 protected:
     unsigned int runId;

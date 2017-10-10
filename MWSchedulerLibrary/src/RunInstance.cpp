@@ -7,6 +7,7 @@ runInstance::runInstance()
 {
     likelihood = 1;
     runId = 0;
+    coreId = 0;
 }
 
 runInstance::runInstance(string starFileName, int w, background bg, const stream * str, int numStreams, area ar)
@@ -14,6 +15,7 @@ runInstance::runInstance(string starFileName, int w, background bg, const stream
     StarFileName = starFileName;
     likelihood = 1;
     runId = 0;
+    coreId = 0;
     vector <stream> tmpstreams;
     if (str)
     {
@@ -75,7 +77,7 @@ pid_t runInstance::runGPU(string pathToSep, unsigned int Id, unsigned int gpuNum
 //To Do:  Test if commandLine will still work with multiple options set.
 pid_t runInstance::run(string pathToSep, unsigned int Id, std::string commandLine)
 {
-    runId = Id;
+    coreId = Id;
 
     stringstream tempstringstream;
     tempstringstream << Id;
@@ -147,7 +149,7 @@ int runInstance::updateStatus()
         {
             //Get Likelihood
             stringstream tempstringstream;
-            tempstringstream << runId;
+            tempstringstream << coreId;
             string resultFilePath = tempstringstream.str() + "/results.txt";
             ifstream infile;
             infile.open(resultFilePath.c_str());
@@ -159,7 +161,7 @@ int runInstance::updateStatus()
             infile >> likelihood;
             infile.close();
             runPid = 0;
-            runId = 0;
+            coreId = 0;
             return 0;
         }
 
