@@ -29,6 +29,10 @@ runInstance::runInstance(string starFileName, int w, background bg, const stream
     
 runInstance::runInstance(string starFileName, parameters params)
 {
+    runId = 0;
+    likelihood = 1;
+    coreId = 0;
+
     StarFileName = starFileName;
     Params = params;
 }

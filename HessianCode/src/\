@@ -50,12 +50,12 @@ int hessian::run(std::string outputFileName)
             tempParams[j] = tempParams[j] + StepSizes[j];
             Scheduler->requestRun(new runInstance(StarFileName, tempParams));
             tempParams = Params;
-            tempParams[i] = tempParams[i] + StepSizes[i];
-            tempParams[j] = tempParams[j] - StepSizes[j];
-            Scheduler->requestRun(new runInstance(StarFileName, tempParams));
-            tempParams = Params;
             tempParams[i] = tempParams[i] - StepSizes[i];
             tempParams[j] = tempParams[j] + StepSizes[j];
+            Scheduler->requestRun(new runInstance(StarFileName, tempParams));
+            tempParams = Params;
+            tempParams[i] = tempParams[i] + StepSizes[i];
+            tempParams[j] = tempParams[j] - StepSizes[j];
             Scheduler->requestRun(new runInstance(StarFileName, tempParams));
             tempParams = Params;
             tempParams[i] = tempParams[i] - StepSizes[i];
@@ -80,20 +80,18 @@ int hessian::run(std::string outputFileName)
     arma::Mat <double> hessian(Params.numParams(), Params.numParams());
     vector<runInstance*> finishedRuns = Scheduler->getFinishedRuns();
 
-    int count = 0;
     for( int i = 0; i < Params.numParams(); i++ )
     {
         for( int j = i; j < Params.numParams(); j++)
         {
-            if(!(finishedRuns[count * 4] && finishedRuns[count * 4 + 1] && finishedRuns[count * 4 + 2] && finishedRuns[count * 4 + 3]))
+            if(!(finishedRuns[i * Params.numParams() - i * 4 + j * 4] && finishedRuns[i * Params.numParams() - i * 4 + j * 4 + 1] && finishedRuns[i * Params.numParams() - i * 4 + j * 4 + 2] && finishedRuns[i * Params.numParams() - i * 4 + j * 4 + 3]))
             {
                 cerr << "Missing Run Results" << endl;
                 Scheduler->cleanup();
                 return -1;
             }
-            hessian(i, j) = (exp(-0.5 * finishedRuns[count * 4]->getLikelihood()) - exp(-0.5 * finishedRuns[count * 4 + 1]->getLikelihood()) - exp(-0.5 * finishedRuns[count * 4 + 2]->getLikelihood()) + exp(-0.5 * finishedRuns[count * 4 + 3]->getLikelihood())) / (4.0 * StepSizes[i] * StepSizes[j]);
+            hessian(i, j) = (exp(-0.5 * finishedRuns[i * Params.numParams() - i * 4 + j * 4]->getLikelihood()) - exp(-0.5 * finishedRuns[i * Params.numParams() - i * 4 + j * 4 + 1]->getLikelihood()) - exp(-0.5 * finishedRuns[i * Params.numParams() - i * 4 + j * 4 + 2]->getLikelihood()) + exp(-0.5 * finishedRuns[i * Params.numParams() - i * 4 + j * 4 + 3]->getLikelihood())) / (4.0 * StepSizes[i] * StepSizes[j]);
             hessian(j,i) = hessian(i,j);
-            count++;
         }
     }
     arma::Mat <double> varience = hessian.i();
