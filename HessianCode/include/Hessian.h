@@ -22,7 +22,7 @@ public:
     ~hessian();
     hessian() { initialized = false; }
     hessian(std::string paramFile, std::string starFileName, scheduler * sched, const std::vector <double> &stepSizes);
-    int run(std::string outputFileName);
+    int run(std::string outputFileName, bool append);
     void cleanup();
 
 };

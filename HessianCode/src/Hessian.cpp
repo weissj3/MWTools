@@ -30,7 +30,7 @@ void hessian::cleanup()
     }
 }
 
-int hessian::run(std::string outputFileName)
+int hessian::run(std::string outputFileName, bool append)
 {
     if(!initialized)
     {
@@ -39,7 +39,14 @@ int hessian::run(std::string outputFileName)
     }
     //Clean out old file
     ofstream output;
-    output.open(outputFileName.c_str());
+    if(append)
+    {
+        output.open(outputFileName.c_str(), ios::out|ios::app);
+    }
+    else
+    {
+        output.open(outputFileName.c_str());
+    }
     //Queue up all of the likelihood calculations for the second derivatives
     for(int i = 0; i < Params.numParams(); i++)
     {
@@ -91,7 +98,7 @@ int hessian::run(std::string outputFileName)
                 Scheduler->cleanup();
                 return -1;
             }
-            hessian(i, j) = (exp(-0.5 * finishedRuns[count * 4]->getLikelihood()) - exp(-0.5 * finishedRuns[count * 4 + 1]->getLikelihood()) - exp(-0.5 * finishedRuns[count * 4 + 2]->getLikelihood()) + exp(-0.5 * finishedRuns[count * 4 + 3]->getLikelihood())) / (4.0 * StepSizes[i] * StepSizes[j]);
+            hessian(i, j) = (finishedRuns[count * 4]->getLikelihood() - finishedRuns[count * 4 + 1]->getLikelihood() - finishedRuns[count * 4 + 2]->getLikelihood() + finishedRuns[count * 4 + 3]->getLikelihood()) / (4.0 * StepSizes[i] * StepSizes[j]);
             hessian(j,i) = hessian(i,j);
             count++;
         }

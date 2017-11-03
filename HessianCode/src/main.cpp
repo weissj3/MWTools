@@ -44,6 +44,7 @@ int main (int argc, char* argv[])
     clock_t timer;
     scheduler * Scheduler;
     hessian * Hessian;
+    bool append = false;
     while(!infile.eof())
     {
         infile >> temp;
@@ -77,12 +78,13 @@ int main (int argc, char* argv[])
             } 
             time_t time1, time2;
             time(&time1);
-            if(Hessian->run(outputFileName) < 0)
+            if(Hessian->run(outputFileName, append) < 0)
             {
                 return -1;
             }
             time(&time2);
             cout << "Time to run: " << difftime(time2, time1) << endl;   
+            append = 1;
             Hessian->cleanup(); 
             delete Hessian;
             delete Scheduler;
