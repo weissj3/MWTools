@@ -1,0 +1,6 @@
+3.9577, 0.19675, 0.19964, 12.05486, 0.19988
+0, 0, 0, 0, 0
+3.95, 0.2, 0.2, 12, 0.2
+3.0, 0.1, 0.1, 1.0, 0.01
+5.0, 0.5, 0.5, 50.0, 0.95
+Forward Evolve Time (Gyr), Stellar Scale Radius (kpc), Radius Ratio $(R_{stars}/ (R_{stars}+R_{dark}))$, Stellar Mass (Sim Units), Mass Ratio $(M_{stars}/ (M_{stars} + M_{dark}))$, 
