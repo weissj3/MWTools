@@ -41,9 +41,9 @@ for i in range(100):
     ThickDisk.append(tmpThick / total)
     Spheroid.append(tmpSpher / total)
 
-plt.plot(R, ThinDisk, label="Thin Disk ($\mu=135$)", lw=1.5)
-plt.plot(R, ThickDisk, label="Thick Disk ($\mu=135$)", lw=1.5)
-plt.plot(R, Spheroid, label="Spheroid ($\mu=135$)", lw=1.5)
+plt.plot(R, ThinDisk, "-g", label="Thin Disk ($\mu=135$)", lw=1.5)
+plt.plot(R, ThickDisk, "-r", label="Thick Disk ($\mu=135$)", lw=1.5)
+plt.plot(R, Spheroid, "-b", label="Hernquist ($\mu=135$)", lw=1.5)
 
 R = []
 ThinDisk = []
@@ -61,16 +61,16 @@ for i in range(100):
     ThickDisk.append(tmpThick / total)
     Spheroid.append(tmpSpher / total)
 
-plt.plot(R, ThinDisk, "--", label="Thin Disk ($\mu=230$)", lw=1.5)
-plt.plot(R, ThickDisk, "--", label="Thick Disk ($\mu=230$)", lw=1.5)
-plt.plot(R, Spheroid, "--", label="Spheroid ($\mu=230$)", lw=1.5)
+plt.plot(R, ThinDisk, "--g", label="Thin Disk ($\mu=230$)", lw=1.5)
+plt.plot(R, ThickDisk, "--r", label="Thick Disk ($\mu=230$)", lw=1.5)
+plt.plot(R, Spheroid, "--b", label="Hernquist ($\mu=230$)", lw=1.5)
 plt.axvspan(0., 2.3, alpha=0.3, color='grey')
 
 plt.xlabel("Heliocentric R (kpc)", fontsize=14)
 plt.ylabel("Stellar Fraction", fontsize=14)
 plt.xticks(fontsize=14)    # fontsize of the tick labels
 plt.yticks(fontsize=14)   # fontsize of the tick labels
-plt.title("Star Fraction vs Height Above The Disk", fontsize=18)
+#plt.title("Star Fraction vs Height Above The Disk", fontsize=18)
 plt.legend(bbox_to_anchor=(1.0, 0.66), fontsize=10)
 plt.show()
 

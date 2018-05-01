@@ -38,8 +38,8 @@ for i in range(100):
 
     hernquist_fraction.append(EpsBG * df.hernquist_profile(x, y, z, Q, 12.0) / total_density[i])
     
-plt.plot(r, disk_fraction, label="Disk Fraction ($\mu=135$)", lw=1.5)
-plt.plot(r, hernquist_fraction, label="Hernquist Fraction ($\mu=135$)", lw=1.5)
+plt.plot(r, disk_fraction, "-r", label="Disk ($\mu=135$)", lw=1.5)
+plt.plot(r, hernquist_fraction, "-b", label="Hernquist ($\mu=135$)", lw=1.5)
 
 total_density = []
 disk_fraction = []
@@ -57,10 +57,10 @@ for i in range(100):
 
     hernquist_fraction.append(EpsBG * df.hernquist_profile(x, y, z, Q, 12.0) / total_density[i])
     
-plt.plot(r, disk_fraction, "--", label="Disk Fraction ($\mu=230$)", lw=1.5)
-plt.plot(r, hernquist_fraction, "--", label="Hernquist Fraction ($\mu=230$)", lw=1.5)
+plt.plot(r, disk_fraction, "--r", label="Disk ($\mu=230$)", lw=1.5)
+plt.plot(r, hernquist_fraction, "--b", label="Hernquist ($\mu=230$)", lw=1.5)
 plt.legend(bbox_to_anchor=(1.0, 0.66))
-plt.title("Thick Disk and Hernquist Fraction Within Wedge", fontsize=18) 
+#plt.title("Thick Disk and Hernquist Fraction Within Wedge", fontsize=18) 
 plt.xlabel("Heliocentric R (kpc)", fontsize=14)
 plt.ylabel("Stellar Fraction", fontsize=14)
 plt.xticks(fontsize=14)    # fontsize of the tick labels

@@ -1,2 +1,4 @@
 import sys
-print [(i/290.0) for i in map(float, sys.argv[1].split())]
+
+for i in range(1, len(sys.argv)):
+    print [(j/(329.0 * 1.41)) for j in map(float, sys.argv[i].split())]
