@@ -54,7 +54,7 @@ int hessian::run(std::string outputFileName, bool append)
         {
             parameters tempParams = Params;
             tempParams[i] = tempParams[i] + StepSizes[i];
-            tempParams[j] = tempParams[j] + StepSizes[j];
+            if( i!=j ) tempParams[j] = tempParams[j] + StepSizes[j];
             Scheduler->requestRun(new runInstance(StarFileName, tempParams));
             tempParams = Params;
             tempParams[i] = tempParams[i] + StepSizes[i];
@@ -66,7 +66,7 @@ int hessian::run(std::string outputFileName, bool append)
             Scheduler->requestRun(new runInstance(StarFileName, tempParams));
             tempParams = Params;
             tempParams[i] = tempParams[i] - StepSizes[i];
-            tempParams[j] = tempParams[j] - StepSizes[j];
+            if (i != j) tempParams[j] = tempParams[j] - StepSizes[j];
             Scheduler->requestRun(new runInstance(StarFileName, tempParams));
         }
 
@@ -99,6 +99,7 @@ int hessian::run(std::string outputFileName, bool append)
                 return -1;
             }
             hessian(i, j) = (finishedRuns[count * 4]->getLikelihood() - finishedRuns[count * 4 + 1]->getLikelihood() - finishedRuns[count * 4 + 2]->getLikelihood() + finishedRuns[count * 4 + 3]->getLikelihood()) / (4.0 * StepSizes[i] * StepSizes[j]);
+            if (i == j) hessian(i,j) = hessian(i,j) * 4.0;
             hessian(j,i) = hessian(i,j);
             count++;
         }
