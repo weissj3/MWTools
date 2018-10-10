@@ -8,5 +8,5 @@ for line in f:
     ln = line.split(", ")
     for i in ln:
         if i == '\n': continue 
-        out += "$" + str(round(float(i), 2)) + "$ & "
+        out += "$ %2g $ & " % (float(i))
     print out[0:len(out)-3]

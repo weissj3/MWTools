@@ -6,3 +6,5 @@
 *.jpg
 *.csv
 main
+Data/
+Figures/

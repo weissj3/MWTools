@@ -5,28 +5,92 @@ import numpy as np
 import math as ma
 import matplotlib.pyplot as plt
 import astro_coordinates as ac
+from matplotlib.ticker import FuncFormatter, MaxNLocator
 
+def removeDuplicates(x, threshold = (0.001, 0.001, 0.001)):
+    for i in range(len(x[0])):
+        for j in range(i+1, len(x[0])):
+            if abs(x[0][i] - x[0][j]) < threshold[0] and abs(x[1][i] - x[1][j]) < threshold[1] and abs(x[2][i] - x[2][j]) < threshold[2]:
+                del x[0][j]
+                del x[1][j]
+                del x[2][j]
+    return x
+    
+    
+    
 def readStarFile(x):
     f = open(x, 'r');
-    numStars = int(f.readline())
-    stars = np.array([ map(float, ln.split()) for ln in f ])
-    
-    stars = ac.lbToEq(stars[:,0], stars[:,1])
-    return stars[0].tolist(), stars[1].tolist()
-
+    stars2 = np.array([ map(float, ln.replace(',', '').split()) for ln in f ])
+    #print len(stars2), len(stars2[0])
+    #stars3 = ac.lbToEq(stars2[:,0], stars2[:,1])
+    #return stars3[0].tolist(), stars3[1].tolist(), stars2[:,2].tolist()
+    return stars2[:,0].tolist(), stars2[:,1].tolist(), stars2[:,2].tolist()
 
 
 def dist_mag(x):
   return ma.log10(x * 100.0) * 5.0 + 3.12
+  
+def mag_dist(x):
+  return round(10.0**((float(x) - 3.12)/5.0)/100., 1) 
 
-SgrMu = [218.1, 192.8, 186.5, 169.2, 145.2, 190.5, 195.2, 167.1, 192.6, 191.0, 211.3, 163.0, 133.0, 195.8, 195.6]
-SgrR  = [41.7,  14.8,  15.0,  13.9,  65.4,  13.9,  41.7,  52.4,  36.4,  46.1,  5.5,   18.9,  17.6,  10.8,  40.6]
 
-BifMu = [235.0, 165.0, 151.2, 235.0, 175.4, 199.6, 185.5, 188.4, 173.0, 174.6, 151.8, 133.0, 209.3, 171.1, 190.0]
-BifR  = [4.0,   33.6,  99.8,  4.0,   5.5,   39.4,  14.4,  12.4,  18.5,  42.2,  21.1,  70.4,  37.0,  46.5,  14.6]
+def format_fn(tick_val, tick_pos):
+    return mag_dist(tick_val)
 
-VirMu = [208.3, 214.3, 206.8, 235.0, 209.2, 156.5, 192.6, 189.1, 181.0, 174.1, 147.8, 249.0, 184.4, 131.1, 133.0]
-VirR =  [15.1,  44.6,  40.0,  55.6,  51.2,  16.5,  35.6,  35.0,  91.5,  21.4,  67.3,  100.0, 15.5,  13.4,  14.2]
+SgrMu = [[], []]
+SgrR  = [[], []]
+SgrT  = [[], []]
+SgrP  = [[], []]
+SgrW  = [[], []] 
+
+BifMu = [[], []]
+BifR  = [[], []]
+BifT  = [[], []]
+BifP  = [[], []]
+BifW  = [[], []] 
+
+VirMu = [[], []]
+VirR  = [[], []]
+VirT  = [[], []]
+VirP  = [[], []]
+VirW  = [[], []] 
+
+f = open(sys.argv[1], 'r')
+count = 0
+wedge = 8
+for line in f:
+    if count == 0:
+        count +=1
+        wedge +=1
+        continue
+    if count == 4:
+        count = 0
+        continue
+    Bad = 0
+    if line[0] == '*':
+        Bad = 1
+        line = line[1:]
+    ln = line.split(", ")
+    if count == 1:
+        SgrMu[Bad].append(float(ln[1]))
+        SgrR[Bad].append(float(ln[2]))
+        SgrT[Bad].append(float(ln[3]))
+        SgrP[Bad].append(float(ln[4]))
+        SgrW[Bad].append(wedge)
+    if count == 2:
+        BifMu[Bad].append(float(ln[1]))
+        BifR[Bad].append(float(ln[2]))
+        BifT[Bad].append(float(ln[3]))
+        BifP[Bad].append(float(ln[4]))
+        BifW[Bad].append(wedge)
+    if count == 3:
+        VirMu[Bad].append(float(ln[1]))
+        VirR[Bad].append(float(ln[2]))
+        VirT[Bad].append(float(ln[3]))
+        VirP[Bad].append(float(ln[4]))
+        VirW[Bad].append(wedge)
+
+    count += 1
 
 wedge = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
 
@@ -37,69 +101,150 @@ BelCRA = [190, 185, 180]
 BelCMag = [21.4, 21.35, 21.45]
 
 
-SgrRA = []
-SgrDec = []
-SgrMag = []
+SgrRA = [[], []]
+SgrDec = [[], []]
+SgrMag = [[], []]
+SgrArrowRA = [[], []]
+SgrArrowDec = [[], []]
+SgrArrowMag = [[], []]
+SgrNorm = [[], []]
 
-BifRA = []
-BifDec = []
-BifMag = []
+BifRA = [[], []]
+BifDec = [[], []]
+BifMag = [[], []]
+BifArrowRA = [[], []]
+BifArrowDec = [[], []]
+BifArrowMag = [[], []]
+BifNorm = [[], []]
 
-VirRA = []
-VirDec = []
-VirMag = []
+VirRA = [[], []]
+VirDec = [[], []]
+VirMag = [[], []]
+VirArrowRA = [[], []]
+VirArrowDec = [[], []]
+VirArrowMag = [[], []]
+VirNorm = [[], []]
 
-for i in range(len(SgrMu)):
-    tmpra, tmpdec = ac.GCToEq(SgrMu[i], 0.0, wedge[i])
-    SgrRA.append(tmpra)
-    SgrDec.append(tmpdec)
-    SgrMag.append(dist_mag(SgrR[i]))
-    tmpra, tmpdec = ac.GCToEq(BifMu[i], 0.0, wedge[i])
-    BifRA.append(tmpra)
-    BifDec.append(tmpdec)
-    BifMag.append(dist_mag(BifR[i]))
-    tmpra, tmpdec = ac.GCToEq(VirMu[i], 0.0, wedge[i])
-    VirRA.append(tmpra)
-    VirDec.append(tmpdec)
-    VirMag.append(dist_mag(VirR[i]))
+for j in range(len(SgrMu)):
+    for i in range(len(SgrMu[j])):
+        tmpra, tmpdec = ac.GCToEq(SgrMu[j][i], 0.0, SgrW[j][i])
+        SgrRA[j].append(tmpra)
+        SgrDec[j].append(tmpdec)
+        SgrMag[j].append(dist_mag(SgrR[j][i]))
+        tmpra, tmpdec, tmpr = ac.streamToEqR(0.0,0.0,1.0,SgrMu[j][i], SgrR[j][i], SgrT[j][i]*ac.deg, SgrP[j][i]*ac.deg, SgrW[j][i])
+        SgrArrowRA[j].append(tmpra[0] - SgrRA[j][i])
+        SgrArrowDec[j].append(tmpdec  - SgrDec[j][i])
+        SgrArrowMag[j].append(dist_mag(tmpr) - SgrMag[j][i])
+        SgrNorm[j].append(ma.sqrt(SgrArrowRA[j][i]**2. + SgrArrowDec[j][i]**2. + SgrArrowMag[j][i]**2.))
+for j in range(len(BifMu)):
+    for i in range(len(BifMu[j])):       
+        tmpra, tmpdec = ac.GCToEq(BifMu[j][i], 0.0, BifW[j][i])
+        BifRA[j].append(tmpra)
+        BifDec[j].append(tmpdec)
+        BifMag[j].append(dist_mag(BifR[j][i]))
+        tmpra, tmpdec, tmpr = ac.streamToEqR(0.0,0.0,1.0,BifMu[j][i], BifR[j][i], BifT[j][i]*ac.deg, BifP[j][i]*ac.deg, BifW[j][i])
+        BifArrowRA[j].append(tmpra[0] - BifRA[j][i])
+        BifArrowDec[j].append(tmpdec - BifDec[j][i])
+        BifArrowMag[j].append(dist_mag(tmpr) - BifMag[j][i])
+        BifNorm[j].append(ma.sqrt(BifArrowRA[j][i]**2. + BifArrowDec[j][i]**2. + BifArrowMag[j][i]**2.))
+for j in range(len(VirMu)):
+    for i in range(len(VirMu[j])):        
+        tmpra, tmpdec = ac.GCToEq(VirMu[j][i], 0.0, VirW[j][i])
+        VirRA[j].append(tmpra)
+        VirDec[j].append(tmpdec)
+        VirMag[j].append(dist_mag(VirR[j][i]))
+        tmpra, tmpdec, tmpr = ac.streamToEqR(0.0,0.0,1.0,VirMu[j][i], VirR[j][i], VirT[j][i]*ac.deg, VirP[j][i]*ac.deg, VirW[j][i])
+        VirArrowRA[j].append(tmpra[0] - VirRA[j][i])
+        VirArrowDec[j].append(tmpdec - VirDec[j][i])
+        VirArrowMag[j].append(dist_mag(tmpr) - VirMag[j][i])
+        VirNorm[j].append(ma.sqrt(VirArrowRA[j][i]**2. + VirArrowDec[j][i]**2. + VirArrowMag[j][i]**2.))
 
 
 plt.figure(1)
-plt.plot(SgrRA, SgrMag, "bo", label="MW@home")
 
-plt.plot(BifRA, BifMag, "bo", label="MW@home")
-plt.plot(VirRA, VirMag, "bo", label="MW@home")
+plt.plot(SgrRA[0], SgrMag[0], "bo", label="MW@home")
+
+plt.plot(BifRA[0], BifMag[0], "bo", label="MW@home")
+plt.plot(VirRA[0], VirMag[0], "bo", label="MW@home")
+
+plt.plot(SgrRA[1], SgrMag[1], "ro", label="MW@home Bad")
+
+plt.plot(BifRA[1], BifMag[1], "ro", label="MW@home Bad")
+plt.plot(VirRA[1], VirMag[1], "ro", label="MW@home Bad")
+
+for j in range(len(SgrRA)):
+    for i in range(len(SgrRA[j])):
+        plt.arrow(SgrRA[j][i], SgrMag[j][i], SgrArrowRA[j][i]/SgrNorm[j][i], SgrArrowMag[j][i]/SgrNorm[j][i], length_includes_head=True, head_width=.1, head_length=.4)
+for j in range(len(BifRA)):
+    for i in range(len(BifRA[j])):
+        plt.arrow(BifRA[j][i], BifMag[j][i], BifArrowRA[j][i]/BifNorm[j][i], BifArrowMag[j][i]/BifNorm[j][i], length_includes_head=True, head_width=.1, head_length=.4)
+for j in range(len(VirRA)):
+    for i in range(len(VirRA[j])):
+        plt.arrow(VirRA[j][i], VirMag[j][i], VirArrowRA[j][i]/VirNorm[j][i], VirArrowMag[j][i]/VirNorm[j][i], length_includes_head=True, head_width=.1, head_length=.4)
 
 plt.plot(BelRA, BelMag, "r*", label="Bel Sgr")
 plt.plot(BelCRA, BelCMag, "g*", label="Bel C")
-plt.legend()
+plt.legend(loc=4)
 plt.xlim(260, 120)
+plt.xlabel("RA", fontsize=18)
+plt.ylabel("i Magnitude", fontsize=18)
+plt.xticks(fontsize=16)    # fontsize of the tick labels
+plt.yticks(fontsize=16) 
+ax2 = plt.gca().twinx()
+ax2.set_ylabel('Distance (kpc)', fontsize=18)
+ax2.set_ylim(16, 24)
+ax2.yaxis.set_major_formatter(FuncFormatter(format_fn))
+ax2.yaxis.set_tick_params(labelsize=16)
+
 #plt.ylim(19,22)
-plt.xlabel("RA")
-plt.ylabel("i Magnitude")
-for i in range(len(wedge)):
-    plt.text(SgrRA[i], SgrMag[i], str(wedge[i])+".1")
-    plt.text(BifRA[i], BifMag[i], str(wedge[i])+".2")
-    plt.text(VirRA[i], VirMag[i], str(wedge[i])+".3")
+for j in range(len(SgrRA)):
+    for i in range(len(SgrRA[j])):
+        plt.text(SgrRA[j][i], SgrMag[j][i], str(SgrW[j][i])+".1")
+for j in range(len(BifRA)):
+    for i in range(len(BifRA[j])):
+        plt.text(BifRA[j][i], BifMag[j][i], str(BifW[j][i])+".2")
+for j in range(len(VirRA)):
+    for i in range(len(VirRA[j])):
+        plt.text(VirRA[j][i], VirMag[j][i], str(VirW[j][i])+".3")
 plt.figure(2)
-plt.plot(SgrRA, SgrDec, "bo", ms=10.0, label="Leading")
-plt.plot(BifRA, BifDec, "bo", ms=10.0, label="Trailing")
-plt.plot(VirRA, VirDec, "bo", ms=10.0, label="Vir")
+plt.plot(SgrRA[0], SgrDec[0], "bo", ms=10.0, label="Leading")
+plt.plot(BifRA[0], BifDec[0], "bo", ms=10.0, label="Trailing")
+plt.plot(VirRA[0], VirDec[0], "bo", ms=10.0, label="Vir")
+plt.plot(SgrRA[1], SgrDec[1], "ro", ms=10.0, label="Leading_Bad")
+plt.plot(BifRA[1], BifDec[1], "ro", ms=10.0, label="Trailing_Bad")
+plt.plot(VirRA[1], VirDec[1], "ro", ms=10.0, label="Vir_Bad")
+for j in range(len(SgrRA)):
+    for i in range(len(SgrRA[j])):
+        plt.arrow(SgrRA[j][i], SgrDec[j][i], SgrArrowRA[j][i]/SgrNorm[j][i], SgrArrowDec[j][i]/SgrNorm[j][i], color="white", length_includes_head=False, head_width=.2, head_length=1.0)
+for j in range(len(BifRA)):
+    for i in range(len(BifRA[j])):
+        plt.arrow(BifRA[j][i], BifDec[j][i], BifArrowRA[j][i]/BifNorm[j][i], BifArrowDec[j][i]/BifNorm[j][i], color="white", length_includes_head=False, head_width=.2, head_length=1.0)
+for j in range(len(VirRA)):
+    for i in range(len(VirRA[j])):
+        plt.arrow(VirRA[j][i], VirDec[j][i], VirArrowRA[j][i]/VirNorm[j][i], VirArrowDec[j][i]/VirNorm[j][i], color="white", length_includes_head=False, head_width=.2, head_length=1.0)
 #plt.legend()
 
-for i in range(len(wedge)):
-    plt.text(SgrRA[i], SgrDec[i], str(wedge[i])+".1", color="white")
-    plt.text(BifRA[i], BifDec[i],  str(wedge[i])+".2", color="white")
-    plt.text(VirRA[i], VirDec[i], str(wedge[i])+".3", color="white")
+for j in range(len(SgrRA)):
+    for i in range(len(SgrRA[j])):
+        plt.text(SgrRA[j][i], SgrDec[j][i], str(SgrW[j][i])+".1", color="white")
+for j in range(len(BifRA)):
+    for i in range(len(BifRA[j])):
+        plt.text(BifRA[j][i], BifDec[j][i],  str(BifW[j][i])+".2", color="white")
+for j in range(len(VirRA)):
+    for i in range(len(VirRA[j])):
+        plt.text(VirRA[j][i], VirDec[j][i], str(VirW[j][i])+".3", color="white")
 
-stars = [ [], [] ]
-for i in range(9, 24):
-    temp1, temp2 = readStarFile("/home/weissj3/Desktop/Newby-tools2/milkyway-tools/milkyway_starfiles/stars-%d.txt" % i)
-    stars[0] = stars[0] + temp1
-    stars[1] = stars[1] + temp2
+stars = [ [], [], [] ]
+stars[0], stars[1], stars[2] = readStarFile("/home/weissj3/Desktop/MWTools/Data/PrimaryStars/PrimaryStars.txt")
+#temp1, temp2, temp3 = readStarFile("/home/weissj3/Desktop/MWTools/Data/PrimaryStars/stars-23.txt")
 
+#stars[0] = stars[0] + temp1
+#stars[1] = stars[1] + temp2
+#stars[2] = stars[2] + temp3
+
+#stars = removeDuplicates(stars)
 print len(stars[0]), len(stars[1])
-plt.hist2d(stars[0], stars[1], bins=[375, 105], cmap="gray")
+plt.hist2d(stars[0], stars[1], bins=[280, 80], range=[[130, 250], [-5, 35]], cmap="binary", vmax=180)
 plt.colorbar()
 plt.xlabel("RA", fontsize=18)
 plt.ylabel("Dec", fontsize=18)

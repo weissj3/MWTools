@@ -52,13 +52,13 @@ for inputFile in sys.argv[4:]:
 
     correctx, correcty = PlotSweep(inputFile, ax, "b")
     ax.plot(correctx[0], correcty[1],'db', ms=10)
-    correctx, correcty = PlotSweep("../1DSweepSimBPLFINALMWResult/"+inputFile.split("/")[len(inputFile.split("/"))-1], ax, "r")
+    correctx, correcty = PlotSweep("../1DSweepStripe19SimBPLFixed_MWResult/"+inputFile.split("/")[len(inputFile.split("/"))-1], ax, "r")
     ax.plot(fitParams[count], fitLikelihood, 'dr', ms=10)
-    ax.annotate((inputFile.replace('/', '')).split(".")[2], (0.5, 0.9), xycoords='axes fraction',  va='center', ha='center', fontsize=18)
+    ax.annotate((inputFile.replace('/', '')).split(".")[1], (0.5, 0.9), xycoords='axes fraction',  va='center', ha='center', fontsize=18)
 
     
     
-    ax.set_ylim(-3.1, -3.0)
+    ax.set_ylim(-3.07, -3.02)
     if count ==1: ax.xaxis.set_major_formatter(FormatStrFormatter('%.2g'))
     plt.setp(ax.get_xticklabels(), fontsize=13)
     if (not sp % 6 == 1):
