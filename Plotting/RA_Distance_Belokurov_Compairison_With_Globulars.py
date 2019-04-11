@@ -160,7 +160,7 @@ stars = [ [], [], [] ]
 Simstars = [ [], [], [] ]
 if Primary:
     high = 15.0
-    low  = 8.0
+    low  = 10.0
 #    stars[0], stars[1], stars[2] = readStarFile_RA("/home/weissj3/Desktop/MWTools/Scripts/PrimaryStars2.txt")
 #    stars[0], stars[1], stars[2] = readStarFile_RA("/home/weissj3/Desktop/MWTools/Scripts/PrimaryStarsAllSky4Stream.txt") 
     stars[0], stars[1], stars[2] = PU.readStarFile_RA("/home/weissj3/Desktop/MWTools/Scripts/PrimaryStars_Redone.txt")
@@ -188,14 +188,14 @@ else:
 print len(stars[0]), len(stars[1])
 #PU.plotKernelDensity(stars[0], stars[1], extent=[[120, 260], [-5, 35]], bins=[280j, 80j])
 #PU.plotKernelDensityDifference(stars[0], stars[1], Simstars[0], Simstars[1], extent=[[120, 260], [-5, 35]], bins=[280j, 80j])
-#BGHistogram = PU.flipUD(np.array(MSTO.CreateObservedBackground([int(low), int(high)], "../Scripts/TestSave3_65kpcConvolvedTriaxial_Increased.data")))
+BGHistogram = PU.flipUD(np.array(MSTO.CreateObservedBackground([int(low), int(high)], "../Scripts/TestSave2_65kpc_BackConvolved.data")))
 
-BGHistogram = PU.flipUD(np.array(MSTO.CreateObservedBackground([int(low), int(high)], "TestSave3_65kpcConvolvedALast.data")))
+#BGHistogram = PU.flipUD(np.array(MSTO.CreateObservedBackground([int(low), int(high)], "TestSave3_65kpcConvolvedALast.data")))
 #BGHistogram = PU.flipUD(np.array(MSTO.CreateObservedBackground([int(low), int(high)], "TestSave3_65kpc.data")))
 starHistogram = PU.flipUD(np.histogram2d(stars[0], stars[1], bins=[280, 80], range=[[120, 260], [-5, 35]])[0].transpose())
 stars = np.ma.masked_array(BGHistogram, PU.CreateMask(starHistogram))
 #stars2 = np.ma.masked_array(BGHistogram2, PU.CreateMask(starHistogram))
-plt.imshow(stars, extent=[120, 260, -5, 35], cmap="binary", vmax=25)
+plt.imshow(starHistogram - stars, extent=[120, 260, -5, 35], cmap="binary")
 #plt.hist2d(stars[0], stars[1], bins=[280, 80], range=[[120, 260], [-5, 35]], cmap="binary")
 #plt.plot(stars[0], stars[1], 'o', ms=0.1) #, bins=[240, 80], range=[[120, 260], [-5, 35]], cmap="binary", vmax=180)
 plt.colorbar()

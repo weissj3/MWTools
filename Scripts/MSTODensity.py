@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 this = sys.modules[__name__]
 global FullSkyModel
 SQ2PI = sc.sqrt(2.0 * ma.pi)
-offset = 1
+offset = 2
 center_offset = float(offset) + 0.5
 
 def modfit_error(x, modfit):
@@ -75,8 +75,8 @@ def BGStars(ra,dec,r):
     l,b = ac.EqTolb(center_ra, center_dec)
     x,y,z = ac.lbr2xyz(l,b,center_r)
     #return V * BGDensity(x,y,z,0.58,300000000,0.9970)
-    return V * BGDensity(x,y,z,0.58,341315437,0.9970)
-    #return V * SausageDensity(x,y,z)# * 100131543700000.
+    #return V * BGDensity(x,y,z,0.58,341315437,0.9970)
+    return V * SausageDensity(x,y,z)# * 100131543700000.
     
 def CreateBackgroundDensity(extent, bins, r):
     Histogram = []
@@ -100,7 +100,7 @@ def StarConvolution(g, r, width):
     sigma_l = .36
     sigma_r = ((0.52 / (1.0 + sc.exp(12.0 - r))) + 0.76)
     sigma = .36
-    if g < 0:
+    if g > 0:
         sigma = sigma_l
     else:
         sigma = sigma_r
@@ -112,8 +112,9 @@ def ConvolveModel(r):
     convolvedModel = [0.0 for i in range(len(r))]
     for i in range(len(r)):
         for j in range(len(convolvedModel)):
-            deltaR = float(i) - float(j)
-            convolvedModel[j] += r[i] * StarConvolution(ac.getg(float(i)+center_offset) - ac.getg(float(j)+center_offset), float(i+center_offset), ac.getg(float(j + offset + 1)) - ac.getg(float(j + offset))) * deltaR * deltaR * deltaR
+            R = float(j+center_offset)
+            #print j, ac.getg(float(j + offset + 1)) - ac.getg(float(j + offset))
+            convolvedModel[j] += r[i] * StarConvolution(ac.getg(float(i)+center_offset) - ac.getg(float(j)+center_offset), float(i+center_offset), ac.getg(float(j + offset + 1)) - ac.getg(float(j + offset))) * R * R * R
     for i in range(len(convolvedModel)):
         convolvedModel[i] = convolvedModel[i] * sigmoid_error(ac.getg(float(i)+center_offset), 1) / ((float(i) + center_offset) * (float(i) + center_offset) * (float(i) + center_offset))# * float(341315437)
     return convolvedModel
@@ -122,7 +123,7 @@ def CreateObservedBackground(r, inputFile):
     InitMWModel(Saved=inputFile)
     ReturnModel = np.array([[0.0 for k in range(len(this.FullSkyModel[0][0]))] for i in range(len(this.FullSkyModel[0]))])
     print r[0], r[1]
-    for i in range(r[0]-3, r[1]-3):
+    for i in range(r[0]-offset, r[1]-offset):
         for j in range(len(ReturnModel)):
             for k in range(len(ReturnModel[j])):
                 ReturnModel[j][k] += this.FullSkyModel[i][j][k]
@@ -153,7 +154,7 @@ def InitMWModel(extent=None, bins=None, Saved=None, Observe = 0):
                     print i, j
                     this.FullSkyModel[:, i, j] = ConvolveModel(this.FullSkyModel[:, i, j])
         
-    a = open("TestSave1_65kpc_Unconvolved.data", "wb")
+    a = open("TestSave2_65kpc_BackConvolved.data", "wb")
     pickle.dump(this.FullSkyModel, a)
     a.close()
     return  
@@ -167,17 +168,7 @@ def TestPencilBeam():
     TestModel = np.array(TestModel)
     TestModel = TestModel[:,0,0]
     
-    convolvedModel = [0.0 for i in range(offset, 65)]
-    #total = 0.0
-    for i in range(len(TestModel)):
-        for j in range(len(convolvedModel)):
-        #Make Sure Is and Js are in the right spots
-        #Make offsets predetermined
-            deltaR = float(i) - float(j)
-            convolvedModel[j] += TestModel[i] * StarConvolution(ac.getg(float(i)+center_offset) - ac.getg(float(j)+center_offset), float(i)+center_offset, ac.getg(float(j+offset+1)) - ac.getg(float(j+offset)))*  deltaR * deltaR * deltaR
-            
-    for i in range(len(convolvedModel)):
-        convolvedModel[i] = convolvedModel[i] * sigmoid_error(ac.getg(float(i)+center_offset), 1) / ((float(i) + center_offset) * (float(i) + center_offset) * (float(i) + center_offset))# * float(341315437)
+    convolvedModel = ConvolveModel(TestModel)
     
     total = 0.0
     for i in range(5):
@@ -194,20 +185,9 @@ def TestPencilBeam():
     
 def TestConvolution():
     TestPoint = [0.0 for i in range(offset, 65)]
-    TestPoint[50] = 1.0
+    TestPoint[0] = 1.0
     #TestPoint[35] = 1.0
-    convolvedModel = [0.0 for i in range(offset, 65)]
-    #total = 0.0
-    for i in range(len(TestPoint)):
-        for j in range(len(convolvedModel)):
-        #Make Sure Is and Js are in the right spots
-        #Make offsets predetermined
-            deltaR = float(i) + center_offset - float(j)+center_offset
-            convolvedModel[j] += StarConvolution(ac.getg(float(i)+center_offset) - ac.getg(float(j)+center_offset), float(i)+center_offset, ac.getg(float(j + offset + 1)) - ac.getg(float(j+offset))) * deltaR * deltaR * deltaR
-            
-    #for i in range(len(convolvedModel)):
-        #convolvedModel[i] = convolvedModel[i] * sigmoid_error(ac.getg(i+3.5), 1) / ((float(i) + center_offset) * (float(i) + center_offset) * (float(i) + center_offset))
-    #plt.plot(range(3,65), TestPoint, 'o')
+    convolvedModel = ConvolveModel(TestPoint)
 
     plt.plot(range(offset,65), convolvedModel, 'o')
     plt.show() 
@@ -227,8 +207,8 @@ def TestDetectionEfficiency():
 if __name__ == "__main__":
     #Test Functions
     #InitMWModel([[255, 260], [0, 5]], [10, 10], Observe=1)
-    InitMWModel([[120, 260], [-5, 35]], [280, 80], Observe=0)
-    #InitMWModel([[120, 260], [-5, 35]], [280, 80], Saved="TestSave3_65kpcConvolvedALast.data", Observe=1)
+    #InitMWModel([[120, 260], [-5, 35]], [280, 80], Observe=0)
+    InitMWModel([[120, 260], [-5, 35]], [280, 80], Saved="TestSave2_65kpc.data", Observe=1)
     #TestConvolution()
     #TestDetectionEfficiency()
     #TestPencilBeam()

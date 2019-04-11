@@ -81,7 +81,7 @@ def checkGlobularClusters():
                 clusters[0].append(tempra)
                 clusters[1].append(tempdec)
                 clusters[2].append(dist_mag(tempr))
-                print line[1:9], templ, tempb, tempr, tempra, tempdec
+                #print line[1:9], templ, tempb, tempr, tempra, tempdec
                 
         
     return clusters
